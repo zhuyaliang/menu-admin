@@ -204,7 +204,93 @@ menuitem_button_press_event (GtkWidget      *menuitem,
     return FALSE;
 }
 static void
-create_menuitem (AppMenu          *menu,
+grab_widget (GtkWidget *widget)
+{
+    g_return_if_fail (widget != NULL);
+
+    GdkWindow *window;
+    GdkDisplay *display;
+    GdkSeat *seat;
+
+    window = gtk_widget_get_window (widget);
+    display = gdk_window_get_display (window);
+
+    seat = gdk_display_get_default_seat (display);
+    gdk_seat_grab (seat, window,
+                   GDK_SEAT_CAPABILITY_ALL, TRUE,
+                   NULL, NULL, NULL, NULL);
+}
+static void
+drag_data_get_menu_cb (GtkWidget        *widget,
+                       GdkDragContext   *context,
+                       GtkSelectionData *selection_data,
+                       guint             info,
+                       guint             time,
+                       AppMenu          *menu)
+{
+    const char *path;
+    char       *uri;
+    char       *uri_list;
+    MateMenuTreeEntry *entry;
+
+    entry = g_object_get_data (G_OBJECT (menu),"panel-menu-tree-entry");
+    path = matemenu_tree_entry_get_desktop_file_path (entry);
+    uri = g_filename_to_uri (path, NULL, NULL);
+    uri_list = g_strconcat (uri, "\r\n", NULL);
+    g_free (uri);
+
+    gtk_selection_data_set (selection_data,
+                gtk_selection_data_get_target (selection_data), 8, (guchar *)uri_list,
+                strlen (uri_list));
+    g_free (uri_list);
+}
+static void
+drag_begin_menu_cb (GtkWidget *widget, GdkDragContext     *context)
+{
+    /* FIXME: workaround for a possible gtk+ bug
+     *    See bugs #92085(gtk+) and #91184(panel) for details.
+     *    Maybe it's not needed with GtkTooltip?
+     */
+    g_object_set (widget, "has-tooltip", FALSE, NULL);
+}
+static void
+drag_end_menu_cb (GtkWidget *widget, GdkDragContext     *context)
+{
+    GtkWidget *xgrab_shell;
+    GtkWidget *parent;
+
+    parent = gtk_widget_get_parent (widget);
+    xgrab_shell = NULL;
+    g_object_set (widget, "has-tooltip", TRUE, NULL);
+    while (parent)
+    {
+        gboolean viewable = TRUE;
+        GtkWidget *tmp = parent;
+
+        while (tmp)
+        {
+            if (!gtk_widget_get_mapped (tmp))
+            {
+                viewable = FALSE;
+                    break;
+            }
+            tmp = gtk_widget_get_parent (tmp);
+        }
+
+        if (viewable)
+            xgrab_shell = parent;
+
+       // parent = gtk_menu_shell_get_parent_shell (GTK_MENU_SHELL (parent));
+    }
+
+    if (xgrab_shell)
+    {
+        grab_widget (xgrab_shell);
+    } 
+}
+
+static void
+create_menuitem (AppMenu               *menu,
                  MateMenuTreeEntry     *entry,
                  MateMenuTreeDirectory *alias_directory)
 {
@@ -221,7 +307,6 @@ create_menuitem (AppMenu          *menu,
                            g_app_info_get_name(G_APP_INFO(ginfo)),
                            g_app_info_get_icon(G_APP_INFO(ginfo)),
                            (gpointer)entry);
-
 
 }
 
@@ -622,17 +707,60 @@ static void activate_app_def (GtkTreeView *treeview,
         app_launch_desktop_file (file_path, screen, NULL);
     }
 }
+static void switch_subapp (GtkWidget *widget,  gpointer data)
+{
+    AppMenu      *menu = APP_MENU(data);
+    GtkTreeIter   iter;
+    GtkTreeModel *model;
+    GIcon        *gicon;
+    MateMenuTreeEntry *entry;
+    GDesktopAppInfo   *ginfo;
+
+    if (gtk_tree_selection_get_selected(GTK_TREE_SELECTION(widget), &model, &iter))
+    {
+        gtk_tree_model_get (model, &iter,
+                            LIST_DATA, &entry,
+                            -1);
+        g_object_set_data_full (G_OBJECT (menu),
+                               "panel-menu-tree-entry",
+                                matemenu_tree_item_ref (entry),
+                               (GDestroyNotify) matemenu_tree_item_unref);
+
+        ginfo = matemenu_tree_entry_get_app_info (entry);
+        if (g_app_info_get_icon (G_APP_INFO(ginfo)) != NULL) 
+        {
+            gicon = g_app_info_get_icon (G_APP_INFO(ginfo));
+            if (gicon != NULL) 
+            {
+                gtk_drag_source_set_icon_gicon (menu->subapp_tree, gicon);
+            }
+        }
+    }
+}
 static void create_subapp_tree (AppMenu *menu)
 {
     GtkTreeModel      *model;
+    GtkTreeSelection *selection;
+    static GtkTargetEntry menu_item_targets[] = {
+             { "text/uri-list", 0, 0 }
+         };
    
     menu->subapp_store = create_store ();
     menu->subapp_tree = create_empty_app_list (menu->subapp_store);
     gtk_tree_view_set_hover_selection (GTK_TREE_VIEW(menu->subapp_tree),TRUE);
+    selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(menu->subapp_tree));
+    gtk_tree_selection_set_mode(selection,GTK_SELECTION_SINGLE);
+    model=gtk_tree_view_get_model(GTK_TREE_VIEW(menu->subapp_tree));
 
     gtk_tree_view_set_activate_on_single_click (GTK_TREE_VIEW(menu->subapp_tree),TRUE);
     gtk_container_add (menu->container, menu->subapp_tree);
     gtk_widget_show (menu->subapp_tree);
+     
+    gtk_drag_source_set (menu->subapp_tree,
+                         GDK_BUTTON1_MASK | GDK_BUTTON2_MASK,
+                         menu_item_targets, 1,
+                         GDK_ACTION_COPY);
+ 
     g_signal_connect (menu->subapp_tree, 
                      "row-activated",
                       G_CALLBACK (activate_app_def), 
@@ -642,6 +770,27 @@ static void create_subapp_tree (AppMenu *menu)
                      "button_press_event",
                       G_CALLBACK (menuitem_button_press_event), 
                       menu);
+  
+    g_signal_connect(selection, 
+                    "changed", 
+                     G_CALLBACK(switch_subapp),
+                     menu);
+    
+    g_signal_connect (G_OBJECT (menu->subapp_tree), 
+                     "drag_begin",
+                      G_CALLBACK (drag_begin_menu_cb), 
+                      NULL);
+
+    g_signal_connect (menu->subapp_tree, 
+                     "drag_data_get",
+                      G_CALLBACK (drag_data_get_menu_cb), 
+                      menu);
+/*
+     g_signal_connect (menu->subapp_tree, 
+                      "drag_end",
+                       G_CALLBACK (drag_end_menu_cb), 
+                       NULL);
+*/
 }    
 AppMenu *
 create_applications_menu (const char   *menu_file,
