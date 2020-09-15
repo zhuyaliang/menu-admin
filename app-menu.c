@@ -14,10 +14,9 @@ struct _AppMenu
 struct _AppMenuClass
 {
     GObjectClass parent_class;
-    void (*show_menu) (AppMenu *app_menu);
+//    void (*show_menu) (AppMenu *app_menui,MateMenuTreeDirectory *dir);
     void (*add_menu) (AppMenu *app_menu);
     void (*delete_menu) (AppMenu *app_menu);
-    void (*changed_menu) (AppMenu *app_menu);
 };
 G_DEFINE_TYPE (AppMenu, app_menu, G_TYPE_OBJECT)
 
@@ -25,7 +24,6 @@ enum {
   SHOW_MENU,
   ADD_MENU,
   DELETE_MENU,
-  CHANGED_MENU,
   LAST_SIGNAL,
 };
 
@@ -34,10 +32,10 @@ static guint signals[LAST_SIGNAL] = { 0 };
 static void submenu_to_display (AppMenu *menu);
 static gboolean submenu_to_display_in_idle (gpointer data);
 typedef char * (*LookupInDir) (const char *basename, const char *dir);
-void emit_switch_signal (AppMenu *menu)
-{
-    g_signal_emit (menu, signals[SHOW_MENU], 0);
-}    
+//void emit_switch_signal (AppMenu *menu)
+//{
+  //  g_signal_emit (menu, signals[SHOW_MENU], 0);
+//}    
 static void
 app_menu_init (AppMenu *self)
 {
@@ -56,12 +54,15 @@ app_menu_class_init (AppMenuClass *klass)
     object_class->finalize = app_menu_finalize;
     
     signals[SHOW_MENU] =
-    g_signal_new ("show_menu",
-                  G_TYPE_FROM_CLASS (klass),
-                  G_SIGNAL_RUN_LAST,
+    g_signal_new ("show-menu",
+                  APP_TYPE_MENU,
+                  G_SIGNAL_RUN_FIRST,
                   0,
-                  NULL, NULL, NULL,
-                  G_TYPE_NONE, 0);
+                  NULL, 
+                  NULL, 
+                  g_cclosure_marshal_VOID__POINTER,
+                  G_TYPE_NONE, 1,
+                  G_TYPE_POINTER);
 
     signals[ADD_MENU] =
     g_signal_new ("add_menu",
@@ -73,14 +74,6 @@ app_menu_class_init (AppMenuClass *klass)
 
     signals[DELETE_MENU] =
     g_signal_new ("delete_menu",
-                  G_TYPE_FROM_CLASS (klass),
-                  G_SIGNAL_RUN_LAST,
-                  0,
-                  NULL, NULL, NULL,
-                  G_TYPE_NONE, 0);
-
-    signals[CHANGED_MENU] =
-    g_signal_new ("changed_menu",
                   G_TYPE_FROM_CLASS (klass),
                   G_SIGNAL_RUN_LAST,
                   0,
@@ -190,7 +183,6 @@ show_item_menu (GtkWidget      *item,
     gtk_style_context_add_class(context,"mate-panel-menu-bar");
     gtk_menu_popup_at_pointer (GTK_MENU (menu), event);
 
-    g_print ("show_item_menu \r\n");
     return TRUE;
 }
 
@@ -421,13 +413,12 @@ static void view_submenu(GtkWidget *widget,  gpointer data)
     GtkTreeModel *model;
     MateMenuTreeDirectory *directory;
 
-    emit_switch_signal (menu);
     if (gtk_tree_selection_get_selected(GTK_TREE_SELECTION(widget), &model, &iter))
     {
-           gtk_tree_model_get (model, &iter,
-                               LIST_DATA, &directory,
+            gtk_tree_model_get (model, &iter,
+                                LIST_DATA, &directory,
                                -1);
-            populate_menu_from_directory (menu,directory);
+            g_signal_emit (menu, signals[SHOW_MENU], 0, directory,NULL);
     }
 
 }
@@ -442,7 +433,10 @@ static void create_category_tree (AppMenu *menu)
     selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(menu->category_tree));
     gtk_tree_selection_set_mode(selection,GTK_SELECTION_SINGLE);
     model=gtk_tree_view_get_model(GTK_TREE_VIEW(menu->category_tree));
-    g_signal_connect(selection, "changed", G_CALLBACK(view_submenu), menu);
+    g_signal_connect(selection, 
+                    "changed", 
+                     G_CALLBACK(view_submenu), 
+                     menu);
     gtk_box_pack_start (menu->box, menu->category_tree, FALSE, FALSE, 0);
     gtk_widget_show (menu->category_tree);
 
@@ -791,7 +785,42 @@ static void create_subapp_tree (AppMenu *menu)
                        G_CALLBACK (drag_end_menu_cb), 
                        NULL);
 */
-}    
+}
+static void show_submenu (AppMenu *menu,MateMenuTreeDirectory *directory,gpointer data)
+{
+    populate_menu_from_directory (menu,directory);
+}   
+static void
+handle_matemenu_tree_changed (MateMenuTree *tree,AppMenu *menu)
+{
+    GError *error = NULL;
+    guint idle_id;
+    
+    gtk_list_store_clear (menu->subapp_store);
+    gtk_list_store_clear (menu->category_store);
+    if (! matemenu_tree_load_sync (tree, &error)) {
+        g_warning("Menu tree reload got error:%s\n", error->message);
+        g_error_free(error);
+    }
+
+    g_object_set_data_full (G_OBJECT (menu),
+                "panel-menu-tree-directory",
+                NULL, NULL);
+
+    g_object_set_data (G_OBJECT (menu),
+               "panel-menu-needs-loading",
+               GUINT_TO_POINTER (TRUE));
+
+    idle_id = g_idle_add_full (G_PRIORITY_LOW,
+                   submenu_to_display_in_idle,
+                   menu,
+                   NULL);
+    g_object_set_data_full (G_OBJECT (menu),
+                "panel-menu-idle-id",
+                GUINT_TO_POINTER (idle_id),
+                remove_submenu_to_display_idle);
+}
+
 AppMenu *
 create_applications_menu (const char   *menu_file,
                           GtkContainer *container,
@@ -808,6 +837,10 @@ create_applications_menu (const char   *menu_file,
     create_category_tree (menu);
     create_subapp_tree (menu);
     
+    g_signal_connect (menu, 
+                     "show-menu",
+                      G_CALLBACK (show_submenu), 
+                      NULL);
     tree = matemenu_tree_new (menu_file, MATEMENU_TREE_FLAGS_SORT_DISPLAY_NAME);
     if (! matemenu_tree_load_sync (tree, &error)) 
     {
@@ -843,13 +876,9 @@ create_applications_menu (const char   *menu_file,
                 "panel-menu-idle-id",
                 GUINT_TO_POINTER (idle_id),
                 remove_submenu_to_display_idle);
-/*
-    g_signal_connect (menu, "button_press_event",
-              G_CALLBACK (menu_dummy_button_press_event), NULL);
 
     g_signal_connect (tree, "changed", G_CALLBACK (handle_matemenu_tree_changed), menu);
-    g_signal_connect (menu, "destroy", G_CALLBACK (remove_matemenu_tree_monitor), tree);
-*/
+//    g_signal_connect (menu, "destroy", G_CALLBACK (remove_matemenu_tree_monitor), tree);
 
     g_object_unref(tree);
     return menu;
