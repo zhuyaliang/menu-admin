@@ -1,6 +1,5 @@
-#include "app-list.h"
 #include <matemenu-tree.h>
-
+#include "app-menu.h"
 struct _AppMenu
 {
     GObject       parent;
@@ -14,7 +13,6 @@ struct _AppMenu
 struct _AppMenuClass
 {
     GObjectClass parent_class;
-//    void (*show_menu) (AppMenu *app_menui,MateMenuTreeDirectory *dir);
     void (*add_menu) (AppMenu *app_menu);
     void (*delete_menu) (AppMenu *app_menu);
 };
@@ -27,15 +25,90 @@ enum {
   LAST_SIGNAL,
 };
 
+enum
+{   
+    COL_USER_FACE= 0,
+    LIST_LABEL ,
+    LIST_DATA ,
+    N_COLUMNS
+};
+
 static guint signals[LAST_SIGNAL] = { 0 };
 
 static void submenu_to_display (AppMenu *menu);
 static gboolean submenu_to_display_in_idle (gpointer data);
 typedef char * (*LookupInDir) (const char *basename, const char *dir);
-//void emit_switch_signal (AppMenu *menu)
-//{
-  //  g_signal_emit (menu, signals[SHOW_MENU], 0);
-//}    
+
+static void list_view_init(GtkWidget *list)
+{
+    GtkCellRenderer   *renderer_icon,*renderer_text;
+    GtkTreeViewColumn *column;
+    column=gtk_tree_view_column_new ();
+
+    gtk_tree_view_column_set_sizing (GTK_TREE_VIEW_COLUMN (column),
+                                     GTK_TREE_VIEW_COLUMN_FIXED);
+    gtk_tree_view_column_set_fixed_width (GTK_TREE_VIEW_COLUMN (column), 280);
+    gtk_tree_view_column_set_spacing (GTK_TREE_VIEW_COLUMN (column),8);
+
+    renderer_icon = gtk_cell_renderer_pixbuf_new();   //user icon
+    g_object_set (G_OBJECT(renderer_icon),"stock-size",5); 
+    gtk_tree_view_column_pack_start (column, renderer_icon, FALSE);
+    gtk_tree_view_column_set_attributes (column,
+                                         renderer_icon,
+                                         "gicon",
+                                         COL_USER_FACE,
+                                         NULL);
+
+    gtk_cell_renderer_set_fixed_size (renderer_icon,48,48);    
+    renderer_text = gtk_cell_renderer_text_new();     //user real name text
+    gtk_tree_view_column_pack_start(column,renderer_text,FALSE);
+    gtk_tree_view_column_add_attribute(column,
+                                       renderer_text,
+                                       "markup",
+                                       LIST_LABEL);
+    gtk_tree_view_append_column(GTK_TREE_VIEW(list), column);
+    gtk_tree_view_set_headers_visible (GTK_TREE_VIEW(list),FALSE);
+}
+static void refresh_app_list_data(GtkWidget   *list,
+                                  const gchar *app_name,
+                                  GIcon       *icon,
+                                  gpointer     data)
+{
+    GtkListStore *store;
+    GtkTreeIter   iter;
+    char         *label;
+
+    store = GTK_LIST_STORE(gtk_tree_view_get_model(GTK_TREE_VIEW(list)));
+    label =  g_markup_printf_escaped("<span color = \'grey\' size='large' weight='bold'>%s</span>", app_name);
+    gtk_list_store_append(store, &iter);
+    gtk_list_store_set(store, 
+                       &iter,
+                       COL_USER_FACE, icon,  //icon
+                       LIST_DATA, data,  
+                       LIST_LABEL,label,     //two name
+                       -1);
+    g_free (label);
+}
+
+static GtkWidget *create_empty_app_list (GtkListStore *store)
+{   
+    GtkWidget        *list;
+    
+    list= gtk_tree_view_new_with_model(GTK_TREE_MODEL(store));
+    list_view_init (list);
+  
+    return list;
+}
+static GtkListStore *create_store (void)
+{
+    GtkListStore     *store;
+    store = gtk_list_store_new(N_COLUMNS,
+                               G_TYPE_ICON,
+                               G_TYPE_STRING,
+                               G_TYPE_POINTER);
+
+    return store;
+}    
 static void
 app_menu_init (AppMenu *self)
 {
@@ -211,6 +284,7 @@ grab_widget (GtkWidget *widget)
     gdk_seat_grab (seat, window,
                    GDK_SEAT_CAPABILITY_ALL, TRUE,
                    NULL, NULL, NULL, NULL);
+    gtk_widget_hide (widget);
 }
 static void
 drag_data_get_menu_cb (GtkWidget        *widget,
@@ -258,7 +332,6 @@ drag_end_menu_cb (GtkWidget *widget, GdkDragContext     *context)
     {
         gboolean viewable = TRUE;
         GtkWidget *tmp = parent;
-
         while (tmp)
         {
             if (!gtk_widget_get_mapped (tmp))
@@ -271,13 +344,12 @@ drag_end_menu_cb (GtkWidget *widget, GdkDragContext     *context)
 
         if (viewable)
             xgrab_shell = parent;
-
-       // parent = gtk_menu_shell_get_parent_shell (GTK_MENU_SHELL (parent));
+        parent = gtk_widget_get_parent (parent);
     }
-
     if (xgrab_shell)
     {
         grab_widget (xgrab_shell);
+     //   grab_widget (gtk_widget_get_parent(widget));
     } 
 }
 
@@ -779,12 +851,12 @@ static void create_subapp_tree (AppMenu *menu)
                      "drag_data_get",
                       G_CALLBACK (drag_data_get_menu_cb), 
                       menu);
-/*
+
      g_signal_connect (menu->subapp_tree, 
                       "drag_end",
                        G_CALLBACK (drag_end_menu_cb), 
                        NULL);
-*/
+
 }
 static void show_submenu (AppMenu *menu,MateMenuTreeDirectory *directory,gpointer data)
 {
@@ -864,9 +936,6 @@ create_applications_menu (const char   *menu_file,
                "panel-menu-needs-loading",
                GUINT_TO_POINTER (TRUE));
 
-    g_signal_connect (menu, "changed-menu",
-            G_CALLBACK (submenu_to_display), NULL);
-
     idle_id = g_idle_add_full (G_PRIORITY_LOW,
                    submenu_to_display_in_idle,
                    menu,
@@ -883,4 +952,3 @@ create_applications_menu (const char   *menu_file,
     g_object_unref(tree);
     return menu;
 }
-

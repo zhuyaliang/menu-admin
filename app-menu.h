@@ -12,5 +12,4 @@ AppMenu        *create_applications_menu     (const char    *menu_file,
                                               GtkContainer *container,
                                               GtkBox       *box);
 
-void           emit_switch_signal            (AppMenu       *menu);        
 #endif
