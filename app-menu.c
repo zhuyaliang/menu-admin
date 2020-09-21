@@ -47,7 +47,7 @@ static void list_view_init(GtkWidget *list)
 
     gtk_tree_view_column_set_sizing (GTK_TREE_VIEW_COLUMN (column),
                                      GTK_TREE_VIEW_COLUMN_FIXED);
-    gtk_tree_view_column_set_fixed_width (GTK_TREE_VIEW_COLUMN (column), 280);
+    gtk_tree_view_column_set_fixed_width (GTK_TREE_VIEW_COLUMN (column), 270);
     gtk_tree_view_column_set_spacing (GTK_TREE_VIEW_COLUMN (column),8);
 
     renderer_icon = gtk_cell_renderer_pixbuf_new();   //user icon
@@ -77,6 +77,7 @@ static void refresh_app_list_data(GtkWidget   *list,
     GtkListStore *store;
     GtkTreeIter   iter;
     char         *label;
+    GtkTreeSelection *selection;
 
     store = GTK_LIST_STORE(gtk_tree_view_get_model(GTK_TREE_VIEW(list)));
     label =  g_markup_printf_escaped("<span color = \'grey\' size='large' weight='bold'>%s</span>", app_name);
@@ -87,6 +88,9 @@ static void refresh_app_list_data(GtkWidget   *list,
                        LIST_DATA, data,  
                        LIST_LABEL,label,     //two name
                        -1);
+    selection = gtk_tree_view_get_selection (GTK_TREE_VIEW(list)); 
+    if (g_strcmp0 (g_icon_to_string(icon),"applications-other") == 0 )
+        gtk_tree_selection_select_iter (selection,&iter);
     g_free (label);
 }
 
@@ -820,7 +824,6 @@ static void create_subapp_tree (AppMenu *menu)
 
     gtk_tree_view_set_activate_on_single_click (GTK_TREE_VIEW(menu->subapp_tree),TRUE);
     gtk_container_add (menu->container, menu->subapp_tree);
-    gtk_widget_show (menu->subapp_tree);
      
     gtk_drag_source_set (menu->subapp_tree,
                          GDK_BUTTON1_MASK | GDK_BUTTON2_MASK,
@@ -947,7 +950,6 @@ create_applications_menu (const char   *menu_file,
                 remove_submenu_to_display_idle);
 
     g_signal_connect (tree, "changed", G_CALLBACK (handle_matemenu_tree_changed), menu);
-//    g_signal_connect (menu, "destroy", G_CALLBACK (remove_matemenu_tree_monitor), tree);
 
     g_object_unref(tree);
     return menu;
