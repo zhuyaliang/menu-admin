@@ -15,6 +15,22 @@ struct _MenuWindowPrivate
 
 G_DEFINE_TYPE_WITH_PRIVATE (MenuWindow, menu_window, GTK_TYPE_WINDOW)
 
+static void set_box_background (GtkWidget *box)
+{
+    GtkCssProvider  *provider;
+    GtkStyleContext *context;
+    gchar           *css = NULL;
+
+    provider = gtk_css_provider_new ();
+    context = gtk_widget_get_style_context (box);
+    css = g_strdup_printf ("window {background-color:rgba(252,252,252,252)}");
+    gtk_css_provider_load_from_data (provider, css, -1, NULL);
+    gtk_style_context_add_provider (context,
+                                    GTK_STYLE_PROVIDER (provider),
+		                            GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
+    g_object_unref (provider);
+    g_free (css);
+}
 static void
 menu_window_fill (MenuWindow *menuwin)
 {
@@ -26,6 +42,7 @@ menu_window_fill (MenuWindow *menuwin)
     GdkVisual *visual;
     GtkWidget *scroll;
 
+    set_box_background (GTK_WIDGET (menuwin));
     frame = gtk_frame_new (NULL);
     gtk_frame_set_shadow_type (GTK_FRAME (frame), GTK_SHADOW_OUT);
     gtk_container_add (GTK_CONTAINER (menuwin), frame);
@@ -43,12 +60,12 @@ menu_window_fill (MenuWindow *menuwin)
     
     app_vbox = gtk_box_new (GTK_ORIENTATION_VERTICAL, 0);
     gtk_box_pack_start (GTK_BOX (vbox), app_vbox,FALSE,FALSE,0);
-    
     scroll = gtk_scrolled_window_new (NULL, NULL);
     gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (scroll),
                                     GTK_POLICY_NEVER, 
                                     GTK_POLICY_AUTOMATIC);
     gtk_box_pack_start (GTK_BOX (app_vbox), scroll, TRUE, TRUE, 0);
+    gtk_widget_show_all (frame);
     menuwin->priv->menu = create_applications_menu ("mate-applications.menu",GTK_CONTAINER(scroll),GTK_BOX(category_box));
 }
 
@@ -105,7 +122,7 @@ menu_window_init (MenuWindow *menuwin)
     gtk_window_stick (window);
     //gtk_window_set_icon_name (window, CLOCK_ICON);
     gtk_window_set_default_size (GTK_WINDOW (window),
-                                 300, 300);
+                                 200, 200);
 }
 
 GtkWidget *

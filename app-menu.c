@@ -48,7 +48,7 @@ static void submenu_to_display (AppMenu *menu);
 static gboolean submenu_to_display_in_idle (gpointer data);
 typedef char * (*LookupInDir) (const char *basename, const char *dir);
 
-static void list_view_init(GtkWidget *list)
+static void list_view_init(GtkWidget *list,int renderer_size)
 {
     GtkCellRenderer   *renderer_icon,*renderer_text;
     GtkTreeViewColumn *column;
@@ -56,11 +56,11 @@ static void list_view_init(GtkWidget *list)
 
     gtk_tree_view_column_set_sizing (GTK_TREE_VIEW_COLUMN (column),
                                      GTK_TREE_VIEW_COLUMN_FIXED);
-    gtk_tree_view_column_set_fixed_width (GTK_TREE_VIEW_COLUMN (column), 270);
+    gtk_tree_view_column_set_fixed_width (GTK_TREE_VIEW_COLUMN (column), renderer_size);
     gtk_tree_view_column_set_spacing (GTK_TREE_VIEW_COLUMN (column),8);
 
     renderer_icon = gtk_cell_renderer_pixbuf_new();   //user icon
-    g_object_set (G_OBJECT(renderer_icon),"stock-size",5); 
+    g_object_set (G_OBJECT(renderer_icon),"stock-size",GTK_ICON_SIZE_DND);
     gtk_tree_view_column_pack_start (column, renderer_icon, FALSE);
     gtk_tree_view_column_set_attributes (column,
                                          renderer_icon,
@@ -137,18 +137,18 @@ static void refresh_app_list_data(GtkWidget   *list,
                        LIST_LABEL,label,     //two name
                        -1);
     selection = gtk_tree_view_get_selection (GTK_TREE_VIEW(list)); 
-    if (g_strcmp0 (g_icon_to_string(icon),"applications-other") == 0 )
-        gtk_tree_selection_select_iter (selection,&iter);
+    //if (g_strcmp0 (g_icon_to_string(icon),"applications-other") == 0 )
+      //  gtk_tree_selection_select_iter (selection,&iter);
     g_free (label);
     g_free (ellipsize);
 }
 
-static GtkWidget *create_empty_app_list (GtkListStore *store)
+static GtkWidget *create_empty_app_list (GtkListStore *store,int renderer_size)
 {   
     GtkWidget        *list;
     
     list= gtk_tree_view_new_with_model(GTK_TREE_MODEL(store));
-    list_view_init (list);
+    list_view_init (list,renderer_size);
   
     return list;
 }
@@ -539,10 +539,11 @@ static void view_submenu(GtkWidget *widget,  gpointer data)
 
     if (gtk_tree_selection_get_selected(GTK_TREE_SELECTION(widget), &model, &iter))
     {
-            gtk_tree_model_get (model, &iter,
-                                LIST_DATA, &directory,
-                               -1);
-            g_signal_emit (menu, signals[SHOW_MENU], 0, directory,NULL);
+        gtk_tree_model_get (model, &iter,
+                            LIST_DATA, &directory,
+                            -1);
+        gtk_widget_show (menu->subapp_tree);
+        g_signal_emit (menu, signals[SHOW_MENU], 0, directory,NULL);
     }
 
 }
@@ -552,7 +553,7 @@ static void create_category_tree (AppMenu *menu)
     GtkTreeModel      *model;
    
     menu->category_store = create_store ();
-    menu->category_tree = create_empty_app_list (menu->category_store);
+    menu->category_tree = create_empty_app_list (menu->category_store,210);
     gtk_tree_view_set_hover_selection (GTK_TREE_VIEW(menu->category_tree),TRUE);
     selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(menu->category_tree));
     gtk_tree_selection_set_mode(selection,GTK_SELECTION_SINGLE);
@@ -563,7 +564,6 @@ static void create_category_tree (AppMenu *menu)
                      menu);
     gtk_box_pack_start (menu->box, menu->category_tree, FALSE, FALSE, 0);
     gtk_widget_show (menu->category_tree);
-
 }
 static char *
 _lookup_in_applications_subdir (const char *basename,
@@ -865,7 +865,7 @@ static void create_subapp_tree (AppMenu *menu)
          };
    
     menu->subapp_store = create_store ();
-    menu->subapp_tree = create_empty_app_list (menu->subapp_store);
+    menu->subapp_tree = create_empty_app_list (menu->subapp_store,270);
     gtk_tree_view_set_hover_selection (GTK_TREE_VIEW(menu->subapp_tree),TRUE);
     selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(menu->subapp_tree));
     gtk_tree_selection_set_mode(selection,GTK_SELECTION_SINGLE);
@@ -873,7 +873,6 @@ static void create_subapp_tree (AppMenu *menu)
 
     gtk_tree_view_set_activate_on_single_click (GTK_TREE_VIEW(menu->subapp_tree),TRUE);
     gtk_container_add (menu->container, menu->subapp_tree);
-     
     gtk_drag_source_set (menu->subapp_tree,
                          GDK_BUTTON1_MASK | GDK_BUTTON2_MASK,
                          menu_item_targets, 1,

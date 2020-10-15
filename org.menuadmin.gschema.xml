@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <schemalist>
     <schema path="/org/admin/menu/" id="org.admin.menu">
-        <key type="s" name="defaule-view">
-            <default>'collection'</default>
-            <summary>Enable Testgsetting</summary>
-            <description>Globally enable or disable the TestApp,Setting it to "false" will disable TestApp.</description>
+        <key type="s" name="defaule-menu">
+            <default>'Collection'</default>
+            <summary>Menu items displayed by default</summary>
+            <description>Open the menu item that the application menu displays by default</description>
         </key>
         <key type="i" name="brightness">
             <default>30</default>
