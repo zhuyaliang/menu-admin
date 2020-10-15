@@ -99,6 +99,7 @@ menu_window_init (MenuWindow *menuwin)
 
     window = GTK_WINDOW (menuwin);
     gtk_window_set_type_hint (window, GDK_WINDOW_TYPE_HINT_MENU);
+    gtk_window_set_position (window,GTK_WIN_POS_MOUSE);
     gtk_window_set_decorated (window, FALSE);
     gtk_window_set_resizable (window, FALSE);
     gtk_window_stick (window);

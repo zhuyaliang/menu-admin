@@ -1,5 +1,7 @@
 #include <matemenu-tree.h>
 #include "app-menu.h"
+#include "app-util.h"
+
 struct _AppMenu
 {
     GObject       parent;
@@ -32,6 +34,13 @@ enum
     LIST_DATA ,
     N_COLUMNS
 };
+typedef enum
+{
+    ELLIPSIZE_NONE,
+    ELLIPSIZE_START,
+    ELLIPSIZE_MIDDLE,
+    ELLIPSIZE_END
+} EllipsizeMode;
 
 static guint signals[LAST_SIGNAL] = { 0 };
 
@@ -69,6 +78,43 @@ static void list_view_init(GtkWidget *list)
     gtk_tree_view_append_column(GTK_TREE_VIEW(list), column);
     gtk_tree_view_set_headers_visible (GTK_TREE_VIEW(list),FALSE);
 }
+static char *get_ellipsize_app_name (const char *str,int length,EllipsizeMode mode)
+{
+    int len,start_width,end_width;
+    const char *text = "...";
+    char  *ellipsize,*start_str,*end_str;
+    char  *ret;
+
+    len = g_utf8_strlen (str,-1);
+    if (len <= length)
+    {
+        return g_strdup (str);
+    }
+    switch (mode)
+    {
+        case ELLIPSIZE_START:
+            ellipsize = g_utf8_substring (str,len - length,len);
+            ret = g_strdup_printf ("%s%s",text,ellipsize);
+            g_free (ellipsize);
+            break;
+        case ELLIPSIZE_MIDDLE:
+            start_width = length/2;
+            end_width = length - length/2;
+            start_str = g_utf8_substring (str,0,start_width);
+            end_str = g_utf8_substring (str,len - end_width,len);
+            ret = g_strdup_printf ("%s%s%s",start_str,text,end_str);
+            g_free (start_str);
+            g_free (end_str);
+            break;
+        case ELLIPSIZE_END:
+            ellipsize = g_utf8_substring (str,0,length);
+            ret = g_strdup_printf ("%s%s",ellipsize,text);
+            g_free (ellipsize);
+        default:
+            break;
+    }
+    return ret;
+}
 static void refresh_app_list_data(GtkWidget   *list,
                                   const gchar *app_name,
                                   GIcon       *icon,
@@ -76,11 +122,13 @@ static void refresh_app_list_data(GtkWidget   *list,
 {
     GtkListStore *store;
     GtkTreeIter   iter;
+    char   *ellipsize;
     char         *label;
     GtkTreeSelection *selection;
 
     store = GTK_LIST_STORE(gtk_tree_view_get_model(GTK_TREE_VIEW(list)));
-    label =  g_markup_printf_escaped("<span color = \'grey\' size='large' weight='bold'>%s</span>", app_name);
+    ellipsize = get_ellipsize_app_name (app_name,14,ELLIPSIZE_MIDDLE);
+    label =  g_markup_printf_escaped("<span color = \'grey\' size='large' weight='bold'>%s</span>", ellipsize);
     gtk_list_store_append(store, &iter);
     gtk_list_store_set(store, 
                        &iter,
@@ -92,6 +140,7 @@ static void refresh_app_list_data(GtkWidget   *list,
     if (g_strcmp0 (g_icon_to_string(icon),"applications-other") == 0 )
         gtk_tree_selection_select_iter (selection,&iter);
     g_free (label);
+    g_free (ellipsize);
 }
 
 static GtkWidget *create_empty_app_list (GtkListStore *store)
@@ -375,7 +424,6 @@ create_menuitem (AppMenu               *menu,
                            g_app_info_get_name(G_APP_INFO(ginfo)),
                            g_app_info_get_icon(G_APP_INFO(ginfo)),
                            (gpointer)entry);
-
 }
 
 static AppMenu *
@@ -805,6 +853,7 @@ static void switch_subapp (GtkWidget *widget,  gpointer data)
                 gtk_drag_source_set_icon_gicon (menu->subapp_tree, gicon);
             }
         }
+        menu_util_set_tooltip_text (menu->subapp_tree,g_app_info_get_name(G_APP_INFO(ginfo)));
     }
 }
 static void create_subapp_tree (AppMenu *menu)
@@ -840,10 +889,10 @@ static void create_subapp_tree (AppMenu *menu)
                       G_CALLBACK (menuitem_button_press_event), 
                       menu);
   
-    g_signal_connect(selection, 
-                    "changed", 
-                     G_CALLBACK(switch_subapp),
-                     menu);
+    g_signal_connect (selection,
+                     "changed",
+                      G_CALLBACK(switch_subapp),
+                      menu);
     
     g_signal_connect (G_OBJECT (menu->subapp_tree), 
                      "drag_begin",
@@ -855,10 +904,10 @@ static void create_subapp_tree (AppMenu *menu)
                       G_CALLBACK (drag_data_get_menu_cb), 
                       menu);
 
-     g_signal_connect (menu->subapp_tree, 
-                      "drag_end",
-                       G_CALLBACK (drag_end_menu_cb), 
-                       NULL);
+    g_signal_connect (menu->subapp_tree,
+                     "drag_end",
+                      G_CALLBACK (drag_end_menu_cb),
+                      NULL);
 
 }
 static void show_submenu (AppMenu *menu,MateMenuTreeDirectory *directory,gpointer data)
