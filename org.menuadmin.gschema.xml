@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <schemalist>
     <schema path="/org/admin/menu/" id="org.admin.menu">
-        <key type="s" name="defaule-menu">
+        <key type="s" name="default-item">
             <default>'Collection'</default>
             <summary>Menu items displayed by default</summary>
             <description>Open the menu item that the application menu displays by default</description>

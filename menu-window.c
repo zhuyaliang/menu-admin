@@ -101,7 +101,7 @@ menu_window_dispose (GObject *object)
 static void
 menu_window_class_init (MenuWindowClass *klass)
 {
-    GObjectClass   *gobject_class   = G_OBJECT_CLASS (klass);
+    GObjectClass   *gobject_class = G_OBJECT_CLASS (klass);
 
     gobject_class->constructor = menu_window_constructor;
     gobject_class->dispose = menu_window_dispose;

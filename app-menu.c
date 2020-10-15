@@ -2,6 +2,9 @@
 #include "app-menu.h"
 #include "app-util.h"
 
+#define  MENU_ADMID_SCHEMA                 "org.admin.menu"
+#define  MENU_DEFAULT_ITEM                 "default-item"
+
 struct _AppMenu
 {
     GObject       parent;
@@ -11,6 +14,8 @@ struct _AppMenu
     GtkWidget    *subapp_tree;
     GtkListStore *category_store;
     GtkListStore *subapp_store;
+    GSettings    *settings;
+    char         *default_item;
 };
 struct _AppMenuClass
 {
@@ -118,6 +123,7 @@ static char *get_ellipsize_app_name (const char *str,int length,EllipsizeMode mo
 static void refresh_app_list_data(GtkWidget   *list,
                                   const gchar *app_name,
                                   GIcon       *icon,
+                                  char        *default_item,
                                   gpointer     data)
 {
     GtkListStore *store;
@@ -136,9 +142,12 @@ static void refresh_app_list_data(GtkWidget   *list,
                        LIST_DATA, data,  
                        LIST_LABEL,label,     //two name
                        -1);
-    selection = gtk_tree_view_get_selection (GTK_TREE_VIEW(list)); 
-    //if (g_strcmp0 (g_icon_to_string(icon),"applications-other") == 0 )
-      //  gtk_tree_selection_select_iter (selection,&iter);
+    selection = gtk_tree_view_get_selection (GTK_TREE_VIEW(list));
+    if (default_item != NULL)
+    {
+        if (g_strcmp0 (app_name,default_item) == 0 )
+            gtk_tree_selection_select_iter (selection,&iter);
+    }
     g_free (label);
     g_free (ellipsize);
 }
@@ -165,12 +174,16 @@ static GtkListStore *create_store (void)
 static void
 app_menu_init (AppMenu *self)
 {
-
+    self->settings = g_settings_new (MENU_ADMID_SCHEMA);
+    self->default_item = g_settings_get_string (self->settings,MENU_DEFAULT_ITEM);
 }
 static void
 app_menu_finalize (GObject *object)
 {
-  AppMenu *self = APP_MENU (object);
+    AppMenu *self = APP_MENU (object);
+    if (self->settings)
+        g_object_unref (self->settings);
+    self->settings = NULL;
 }
 static void
 app_menu_class_init (AppMenuClass *klass)
@@ -222,7 +235,8 @@ create_submenu_entry (AppMenu               *menu,
     refresh_app_list_data (menu->category_tree,
                            matemenu_tree_directory_get_name (directory),
                            matemenu_tree_directory_get_icon (directory),
-                           (gpointer)directory);
+                           menu->default_item,
+                          (gpointer)directory);
 
 
     return menu->category_tree;
@@ -423,6 +437,7 @@ create_menuitem (AppMenu               *menu,
     refresh_app_list_data (menu->subapp_tree,
                            g_app_info_get_name(G_APP_INFO(ginfo)),
                            g_app_info_get_icon(G_APP_INFO(ginfo)),
+                           NULL,
                            (gpointer)entry);
 }
 
@@ -535,6 +550,8 @@ static void view_submenu(GtkWidget *widget,  gpointer data)
     AppMenu      *menu = APP_MENU(data);
     GtkTreeIter   iter;
     GtkTreeModel *model;
+    const char   *item_name;
+
     MateMenuTreeDirectory *directory;
 
     if (gtk_tree_selection_get_selected(GTK_TREE_SELECTION(widget), &model, &iter))
@@ -542,6 +559,8 @@ static void view_submenu(GtkWidget *widget,  gpointer data)
         gtk_tree_model_get (model, &iter,
                             LIST_DATA, &directory,
                             -1);
+        item_name = matemenu_tree_directory_get_name (directory);
+        g_settings_set_string (menu->settings,MENU_DEFAULT_ITEM,item_name);
         gtk_widget_show (menu->subapp_tree);
         g_signal_emit (menu, signals[SHOW_MENU], 0, directory,NULL);
     }
