@@ -86,3 +86,14 @@ void menu_util_set_tooltip_text (GtkWidget  *widget,
                           (GClosureNotify) G_CALLBACK (g_free),
                            0);
 }
+GtkWidget *set_button_style(const gchar *button_text,const gchar *icon_name)
+{
+    GtkWidget *button;
+    GtkWidget *image;
+
+    button = gtk_button_new ();
+    image  = gtk_image_new_from_icon_name (icon_name, GTK_ICON_SIZE_BUTTON);
+    gtk_button_set_image (GTK_BUTTON (button), image);
+
+    return button;
+}

@@ -5,6 +5,7 @@
 
 #include "menu-window.h"
 #include "app-menu.h"
+#include "app-util.h"
 
 
 struct _MenuWindowPrivate 
@@ -31,24 +32,59 @@ static void set_box_background (GtkWidget *box)
     g_object_unref (provider);
     g_free (css);
 }
+static GtkWidget *create_manager_menu (MenuWindow *menuwin)
+{
+    GtkWidget *table;
+    GtkWidget *search_button;
+    GtkWidget *menu_button;
+    GtkWidget *user_button;
+
+    table = gtk_grid_new();
+    gtk_grid_set_column_homogeneous(GTK_GRID(table),TRUE);
+    gtk_grid_set_row_spacing(GTK_GRID(table), 10);
+    gtk_grid_set_column_spacing(GTK_GRID(table), 10);
+
+    GtkWidget *lable_space = gtk_separator_new (GTK_ORIENTATION_HORIZONTAL);
+    gtk_grid_attach(GTK_GRID(table) ,lable_space, 0, 0, 3, 1);
+
+    search_button = set_button_style ("search","edit-find-symbolic");
+    gtk_button_set_relief (GTK_BUTTON(search_button),GTK_RELIEF_NONE);
+    gtk_grid_attach(GTK_GRID(table), search_button, 0, 1, 1, 1);
+
+    menu_button = set_button_style (_("more option"),"open-menu-symbolic");
+    gtk_button_set_relief (GTK_BUTTON(menu_button),GTK_RELIEF_NONE);
+    gtk_grid_attach(GTK_GRID(table), menu_button, 1, 1, 1, 1);
+
+    user_button = set_button_style (_("more option"),"avatar-default-symbolic");
+    gtk_button_set_relief (GTK_BUTTON(user_button),GTK_RELIEF_NONE);
+    gtk_grid_attach(GTK_GRID(table), user_button, 2, 1, 1, 1);
+
+    return table;
+}
 static void
 menu_window_fill (MenuWindow *menuwin)
 {
     GtkWidget *frame;
+    GtkWidget *hbox;
     GtkWidget *vbox;
-    GtkWidget *category_box,*app_vbox;
+    GtkWidget *category_box,*app_vbox,*opt_box;
     GtkWidget *toplevel;
     GdkScreen *screen;
     GdkVisual *visual;
     GtkWidget *scroll;
+    GtkWidget *table;
 
     set_box_background (GTK_WIDGET (menuwin));
     frame = gtk_frame_new (NULL);
     gtk_frame_set_shadow_type (GTK_FRAME (frame), GTK_SHADOW_OUT);
     gtk_container_add (GTK_CONTAINER (menuwin), frame);
-    
+
+    hbox = gtk_box_new (GTK_ORIENTATION_VERTICAL, 0);
+    gtk_container_add (GTK_CONTAINER (frame), hbox);
+
     vbox = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 0);
-    gtk_container_add (GTK_CONTAINER (frame), vbox);
+    //gtk_container_add (GTK_CONTAINER (frame), vbox);
+    gtk_box_pack_start (GTK_BOX (hbox), vbox, FALSE, FALSE, 0);
     
     toplevel = gtk_widget_get_toplevel (frame);
     screen = gtk_widget_get_screen(GTK_WIDGET(toplevel));
@@ -65,6 +101,9 @@ menu_window_fill (MenuWindow *menuwin)
                                     GTK_POLICY_NEVER, 
                                     GTK_POLICY_AUTOMATIC);
     gtk_box_pack_start (GTK_BOX (app_vbox), scroll, TRUE, TRUE, 0);
+    table = create_manager_menu (menuwin);
+    gtk_box_pack_start(GTK_BOX(hbox),table, TRUE, TRUE,0);
+
     gtk_widget_show_all (frame);
     menuwin->priv->menu = create_applications_menu ("mate-applications.menu",GTK_CONTAINER(scroll),GTK_BOX(category_box));
 }
