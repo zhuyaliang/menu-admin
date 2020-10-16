@@ -5,6 +5,8 @@
 #define  MENU_ADMID_SCHEMA                 "org.admin.menu"
 #define  MENU_DEFAULT_ITEM                 "default-item"
 #define  MENU_ICON_SIZE                    "icon-size"
+#define  MENU_FONT_SIZE                    "font-size"
+
 
 struct _AppMenu
 {
@@ -18,6 +20,7 @@ struct _AppMenu
     GSettings    *settings;
     char         *default_item;
     gint          icon_size;
+    gint          font_size;
 };
 struct _AppMenuClass
 {
@@ -49,6 +52,7 @@ typedef enum
     ELLIPSIZE_END
 } EllipsizeMode;
 
+static char *font_size [] = {"xx-small","x-small","small","medium","large","x-large","xx-large"};
 static guint signals[LAST_SIGNAL] = { 0 };
 
 static void submenu_to_display (AppMenu *menu);
@@ -132,6 +136,7 @@ static void refresh_app_list_data(GtkWidget   *list,
                                   const gchar *app_name,
                                   GIcon       *icon,
                                   char        *default_item,
+                                  gint         index,
                                   gpointer     data)
 {
     GtkListStore *store;
@@ -142,7 +147,7 @@ static void refresh_app_list_data(GtkWidget   *list,
 
     store = GTK_LIST_STORE(gtk_tree_view_get_model(GTK_TREE_VIEW(list)));
     ellipsize = get_ellipsize_app_name (app_name,14,ELLIPSIZE_MIDDLE);
-    label =  g_markup_printf_escaped("<span color = \'grey\' size='large' weight='bold'>%s</span>", ellipsize);
+    label =  g_markup_printf_escaped("<span color = \'grey\' size=\"%s\" weight='bold'>%s</span>",font_size[index],ellipsize);
     gtk_list_store_append(store, &iter);
     gtk_list_store_set(store, 
                        &iter,
@@ -181,65 +186,6 @@ static GtkListStore *create_store (void)
 
     return store;
 }
-static void
-app_menu_init (AppMenu *self)
-{
-    self->settings = g_settings_new (MENU_ADMID_SCHEMA);
-    self->default_item = g_settings_get_string (self->settings,MENU_DEFAULT_ITEM);
-    self->icon_size = g_settings_get_enum (self->settings, MENU_ICON_SIZE);
-
-}
-static void
-app_menu_finalize (GObject *object)
-{
-    AppMenu *self = APP_MENU (object);
-    if (self->settings)
-        g_object_unref (self->settings);
-    self->settings = NULL;
-}
-static void
-app_menu_class_init (AppMenuClass *klass)
-{
-    GObjectClass   *object_class = G_OBJECT_CLASS (klass);
-
-    object_class->finalize = app_menu_finalize;
-    
-    signals[SHOW_MENU] =
-    g_signal_new ("show-menu",
-                  APP_TYPE_MENU,
-                  G_SIGNAL_RUN_FIRST,
-                  0,
-                  NULL, 
-                  NULL, 
-                  g_cclosure_marshal_VOID__POINTER,
-                  G_TYPE_NONE, 1,
-                  G_TYPE_POINTER);
-
-    signals[ADD_MENU] =
-    g_signal_new ("add_menu",
-                  G_TYPE_FROM_CLASS (klass),
-                  G_SIGNAL_RUN_LAST,
-                  0,
-                  NULL, NULL, NULL,
-                  G_TYPE_NONE, 0);
-
-    signals[CHANGED_MENU] =
-    g_signal_new ("changed_menu",
-                  G_TYPE_FROM_CLASS (klass),
-                  G_SIGNAL_RUN_LAST,
-                  0,
-                  NULL, NULL, NULL,
-                  G_TYPE_NONE, 1,
-                  G_TYPE_UINT);
-
-}
-AppMenu *app_menu_new (void)
-{
-    AppMenu *self;
-
-    self = g_object_new (APP_TYPE_MENU,NULL);
-    return self;
-}
 
 static GtkWidget *
 create_submenu_entry (AppMenu               *menu,
@@ -249,6 +195,7 @@ create_submenu_entry (AppMenu               *menu,
                            matemenu_tree_directory_get_name (directory),
                            matemenu_tree_directory_get_icon (directory),
                            menu->default_item,
+                           menu->font_size,
                           (gpointer)directory);
 
 
@@ -451,6 +398,7 @@ create_menuitem (AppMenu               *menu,
                            g_app_info_get_name(G_APP_INFO(ginfo)),
                            g_app_info_get_icon(G_APP_INFO(ginfo)),
                            NULL,
+                           menu->font_size,
                            (gpointer)entry);
 }
 
@@ -941,10 +889,6 @@ static void create_subapp_tree (AppMenu *menu)
                       NULL);
 
 }
-static void show_submenu (AppMenu *menu,MateMenuTreeDirectory *directory,gpointer data)
-{
-    populate_menu_from_directory (menu,directory);
-}   
 static void
 handle_matemenu_tree_changed (MateMenuTree *tree,AppMenu *menu)
 {
@@ -990,12 +934,97 @@ app_menu_changed (AppMenu       *menu,
 
     handle_matemenu_tree_changed (tree,menu);
 }
-static void menu_icon_size_changed (GSettings *settings,
-                                    gchar     *key,
-                                    AppMenu   *menu)
+static void
+app_menu_init (AppMenu *self)
+{
+    self->settings = g_settings_new (MENU_ADMID_SCHEMA);
+    self->default_item = g_settings_get_string (self->settings,MENU_DEFAULT_ITEM);
+    self->icon_size = g_settings_get_enum (self->settings, MENU_ICON_SIZE);
+    self->font_size = g_settings_get_enum (self->settings, MENU_FONT_SIZE);
+}
+static void
+app_menu_finalize (GObject *object)
+{
+    AppMenu *self = APP_MENU (object);
+    if (self->settings)
+        g_object_unref (self->settings);
+    self->settings = NULL;
+}
+static void
+app_menu_class_init (AppMenuClass *klass)
+{
+    GObjectClass   *object_class = G_OBJECT_CLASS (klass);
+
+    object_class->finalize = app_menu_finalize;
+
+    signals[SHOW_MENU] =
+    g_signal_new ("show-menu",
+                  APP_TYPE_MENU,
+                  G_SIGNAL_RUN_FIRST,
+                  0,
+                  NULL,
+                  NULL,
+                  g_cclosure_marshal_VOID__POINTER,
+                  G_TYPE_NONE, 1,
+                  G_TYPE_POINTER);
+
+    signals[ADD_MENU] =
+    g_signal_new ("add_menu",
+                  G_TYPE_FROM_CLASS (klass),
+                  G_SIGNAL_RUN_LAST,
+                  0,
+                  NULL, NULL, NULL,
+                  G_TYPE_NONE, 0);
+
+    signals[CHANGED_MENU] =
+    g_signal_new ("changed_menu",
+                  G_TYPE_FROM_CLASS (klass),
+                  G_SIGNAL_RUN_LAST,
+                  0,
+                  NULL, NULL, NULL,
+                  G_TYPE_NONE, 1,
+                  G_TYPE_UINT);
+
+}
+static void gsettings_icon_size_changed (GSettings *settings,
+                                         gchar     *key,
+                                         AppMenu   *menu)
 {
     menu->icon_size = g_settings_get_enum (settings,key);
     g_signal_emit (menu, signals[CHANGED_MENU], 0, menu->icon_size, NULL);
+}
+static void gsettings_font_size_changed (GSettings *settings,
+                                         gchar     *key,
+                                         AppMenu   *menu)
+{
+    menu->font_size = g_settings_get_enum (settings,key);
+    g_signal_emit (menu, signals[CHANGED_MENU], 0, menu->icon_size, NULL);
+}
+static void show_submenu (AppMenu *menu,MateMenuTreeDirectory *directory,gpointer data)
+{
+    populate_menu_from_directory (menu,directory);
+}
+AppMenu *app_menu_new (void)
+{
+    AppMenu *menu;
+
+    menu = g_object_new (APP_TYPE_MENU,NULL);
+
+    g_signal_connect (menu,
+                     "show-menu",
+                      G_CALLBACK (show_submenu),
+                      NULL);
+
+    g_signal_connect (menu->settings,
+                      "changed::" MENU_ICON_SIZE,
+                      G_CALLBACK (gsettings_icon_size_changed),
+                      menu);
+
+    g_signal_connect (menu->settings,
+                      "changed::" MENU_FONT_SIZE,
+                      G_CALLBACK (gsettings_font_size_changed),
+                      menu);
+    return menu;
 }
 AppMenu *
 create_applications_menu (const char   *menu_file,
@@ -1013,10 +1042,6 @@ create_applications_menu (const char   *menu_file,
     create_category_tree (menu);
     create_subapp_tree (menu);
     
-    g_signal_connect (menu, 
-                     "show-menu",
-                      G_CALLBACK (show_submenu), 
-                      NULL);
     tree = matemenu_tree_new (menu_file, MATEMENU_TREE_FLAGS_SORT_DISPLAY_NAME);
     if (! matemenu_tree_load_sync (tree, &error)) 
     {
@@ -1053,11 +1078,6 @@ create_applications_menu (const char   *menu_file,
     g_signal_connect (tree,
                      "changed",
                       G_CALLBACK (handle_matemenu_tree_changed),
-                      menu);
-
-    g_signal_connect (menu->settings,
-                      "changed::" MENU_ICON_SIZE,
-                      G_CALLBACK (menu_icon_size_changed),
                       menu);
 
     g_signal_connect (menu,

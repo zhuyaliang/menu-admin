@@ -7,6 +7,16 @@
     <value nick="48px" value="6"/>
     </enum>
 
+    <enum id="org.admin.menu.font-size">
+    <value nick="xx-small" value="0"/>
+    <value nick="x-small" value="1"/>
+    <value nick="small" value="2"/>
+    <value nick="medium" value="3"/>
+    <value nick="large" value="4"/>
+    <value nick="x-large" value="5"/>
+    <value nick="xx-large" value="6"/>
+    </enum>
+
     <schema path="/org/admin/menu/" id="org.admin.menu">
         <key type="s" name="default-item">
             <default>'Collection'</default>
@@ -16,7 +26,12 @@
         <key name="icon-size" enum="org.admin.menu.icon-size">
         <default>'32px'</default>
         <summary>Menu bar icon size</summary>
-        <description>Set the size of an icon used in menu bar. The panel must be restarted for this to take effect.</description>
+        <description>Set the size of an icon used in menu bar</description>
+        </key>
+        <key name="font-size" enum="org.admin.menu.font-size">
+        <default>'medium'</default>
+        <summary>Menu bar font size</summary>
+        <description>Set the size of an font used in menu bar</description>
         </key>
     </schema>
 </schemalist>
