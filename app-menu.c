@@ -4,6 +4,7 @@
 
 #define  MENU_ADMID_SCHEMA                 "org.admin.menu"
 #define  MENU_DEFAULT_ITEM                 "default-item"
+#define  MENU_ICON_SIZE                    "icon-size"
 
 struct _AppMenu
 {
@@ -16,6 +17,7 @@ struct _AppMenu
     GtkListStore *subapp_store;
     GSettings    *settings;
     char         *default_item;
+    gint          icon_size;
 };
 struct _AppMenuClass
 {
@@ -53,10 +55,11 @@ static void submenu_to_display (AppMenu *menu);
 static gboolean submenu_to_display_in_idle (gpointer data);
 typedef char * (*LookupInDir) (const char *basename, const char *dir);
 
-static void list_view_init(GtkWidget *list,int renderer_size)
+static void list_view_init(GtkWidget *list,int renderer_size,guint icon_size)
 {
     GtkCellRenderer   *renderer_icon,*renderer_text;
     GtkTreeViewColumn *column;
+    guint size = 3;
     column=gtk_tree_view_column_new ();
 
     gtk_tree_view_column_set_sizing (GTK_TREE_VIEW_COLUMN (column),
@@ -65,7 +68,7 @@ static void list_view_init(GtkWidget *list,int renderer_size)
     gtk_tree_view_column_set_spacing (GTK_TREE_VIEW_COLUMN (column),8);
 
     renderer_icon = gtk_cell_renderer_pixbuf_new();   //user icon
-    g_object_set (G_OBJECT(renderer_icon),"stock-size",GTK_ICON_SIZE_DND);
+    g_object_set (G_OBJECT(renderer_icon),"stock-size",icon_size);
     gtk_tree_view_column_pack_start (column, renderer_icon, FALSE);
     gtk_tree_view_column_set_attributes (column,
                                          renderer_icon,
@@ -152,12 +155,14 @@ static void refresh_app_list_data(GtkWidget   *list,
     g_free (ellipsize);
 }
 
-static GtkWidget *create_empty_app_list (GtkListStore *store,int renderer_size)
+static GtkWidget *create_empty_app_list (GtkListStore *store,
+                                         int           renderer_size,
+                                         int           icon_size)
 {   
     GtkWidget        *list;
     
     list= gtk_tree_view_new_with_model(GTK_TREE_MODEL(store));
-    list_view_init (list,renderer_size);
+    list_view_init (list,renderer_size,icon_size);
   
     return list;
 }
@@ -176,6 +181,7 @@ app_menu_init (AppMenu *self)
 {
     self->settings = g_settings_new (MENU_ADMID_SCHEMA);
     self->default_item = g_settings_get_string (self->settings,MENU_DEFAULT_ITEM);
+    self->icon_size = g_settings_get_enum (self->settings, MENU_ICON_SIZE);
 }
 static void
 app_menu_finalize (GObject *object)
@@ -572,7 +578,7 @@ static void create_category_tree (AppMenu *menu)
     GtkTreeModel      *model;
    
     menu->category_store = create_store ();
-    menu->category_tree = create_empty_app_list (menu->category_store,210);
+    menu->category_tree = create_empty_app_list (menu->category_store,210,menu->icon_size);
     gtk_tree_view_set_hover_selection (GTK_TREE_VIEW(menu->category_tree),TRUE);
     selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(menu->category_tree));
     gtk_tree_selection_set_mode(selection,GTK_SELECTION_SINGLE);
@@ -884,7 +890,7 @@ static void create_subapp_tree (AppMenu *menu)
          };
    
     menu->subapp_store = create_store ();
-    menu->subapp_tree = create_empty_app_list (menu->subapp_store,270);
+    menu->subapp_tree = create_empty_app_list (menu->subapp_store,270,menu->icon_size);
     gtk_tree_view_set_hover_selection (GTK_TREE_VIEW(menu->subapp_tree),TRUE);
     selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(menu->subapp_tree));
     gtk_tree_selection_set_mode(selection,GTK_SELECTION_SINGLE);
