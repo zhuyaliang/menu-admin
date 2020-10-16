@@ -30,7 +30,7 @@ G_DEFINE_TYPE (AppMenu, app_menu, G_TYPE_OBJECT)
 enum {
   SHOW_MENU,
   ADD_MENU,
-  DELETE_MENU,
+  CHANGED_MENU,
   LAST_SIGNAL,
 };
 
@@ -57,15 +57,17 @@ typedef char * (*LookupInDir) (const char *basename, const char *dir);
 
 static void list_view_init(GtkWidget *list,int renderer_size,guint icon_size)
 {
-    GtkCellRenderer   *renderer_icon,*renderer_text;
     GtkTreeViewColumn *column;
-    guint size = 3;
+    GtkCellRenderer   *renderer_icon,*renderer_text;
     column=gtk_tree_view_column_new ();
 
     gtk_tree_view_column_set_sizing (GTK_TREE_VIEW_COLUMN (column),
                                      GTK_TREE_VIEW_COLUMN_FIXED);
     gtk_tree_view_column_set_fixed_width (GTK_TREE_VIEW_COLUMN (column), renderer_size);
     gtk_tree_view_column_set_spacing (GTK_TREE_VIEW_COLUMN (column),8);
+    g_object_set_data (G_OBJECT (list),
+                       "tree-list-column",
+                       column);
 
     renderer_icon = gtk_cell_renderer_pixbuf_new();   //user icon
     g_object_set (G_OBJECT(renderer_icon),"stock-size",icon_size);
@@ -75,6 +77,9 @@ static void list_view_init(GtkWidget *list,int renderer_size,guint icon_size)
                                          "gicon",
                                          COL_USER_FACE,
                                          NULL);
+    g_object_set_data (G_OBJECT (list),
+                       "tree-list-renderer-icon",
+                       renderer_icon);
 
     gtk_cell_renderer_set_fixed_size (renderer_icon,48,48);    
     renderer_text = gtk_cell_renderer_text_new();     //user real name text
@@ -175,13 +180,14 @@ static GtkListStore *create_store (void)
                                G_TYPE_POINTER);
 
     return store;
-}    
+}
 static void
 app_menu_init (AppMenu *self)
 {
     self->settings = g_settings_new (MENU_ADMID_SCHEMA);
     self->default_item = g_settings_get_string (self->settings,MENU_DEFAULT_ITEM);
     self->icon_size = g_settings_get_enum (self->settings, MENU_ICON_SIZE);
+
 }
 static void
 app_menu_finalize (GObject *object)
@@ -217,13 +223,14 @@ app_menu_class_init (AppMenuClass *klass)
                   NULL, NULL, NULL,
                   G_TYPE_NONE, 0);
 
-    signals[DELETE_MENU] =
-    g_signal_new ("delete_menu",
+    signals[CHANGED_MENU] =
+    g_signal_new ("changed_menu",
                   G_TYPE_FROM_CLASS (klass),
                   G_SIGNAL_RUN_LAST,
                   0,
                   NULL, NULL, NULL,
-                  G_TYPE_NONE, 0);
+                  G_TYPE_NONE, 1,
+                  G_TYPE_UINT);
 
 }
 AppMenu *app_menu_new (void)
@@ -968,7 +975,28 @@ handle_matemenu_tree_changed (MateMenuTree *tree,AppMenu *menu)
                 GUINT_TO_POINTER (idle_id),
                 remove_submenu_to_display_idle);
 }
+static void
+app_menu_changed (AppMenu       *menu,
+                  guint         icon_size,
+                  MateMenuTree  *tree)
+{
+    GtkCellRenderer   *renderer_icon;
 
+    renderer_icon = g_object_get_data (G_OBJECT (menu->category_tree),"tree-list-renderer-icon");
+    g_object_set (G_OBJECT(renderer_icon),"stock-size",icon_size);
+
+    renderer_icon = g_object_get_data (G_OBJECT (menu->subapp_tree),"tree-list-renderer-icon");
+    g_object_set (G_OBJECT(renderer_icon),"stock-size",icon_size);
+
+    handle_matemenu_tree_changed (tree,menu);
+}
+static void menu_icon_size_changed (GSettings *settings,
+                                    gchar     *key,
+                                    AppMenu   *menu)
+{
+    menu->icon_size = g_settings_get_enum (settings,key);
+    g_signal_emit (menu, signals[CHANGED_MENU], 0, menu->icon_size, NULL);
+}
 AppMenu *
 create_applications_menu (const char   *menu_file,
                           GtkContainer *container,
@@ -1022,8 +1050,20 @@ create_applications_menu (const char   *menu_file,
                 GUINT_TO_POINTER (idle_id),
                 remove_submenu_to_display_idle);
 
-    g_signal_connect (tree, "changed", G_CALLBACK (handle_matemenu_tree_changed), menu);
+    g_signal_connect (tree,
+                     "changed",
+                      G_CALLBACK (handle_matemenu_tree_changed),
+                      menu);
 
+    g_signal_connect (menu->settings,
+                      "changed::" MENU_ICON_SIZE,
+                      G_CALLBACK (menu_icon_size_changed),
+                      menu);
+
+    g_signal_connect (menu,
+                     "changed-menu",
+                      G_CALLBACK (app_menu_changed),
+                      tree);
     g_object_unref(tree);
     return menu;
 }
