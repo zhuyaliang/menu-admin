@@ -38,14 +38,15 @@ static GtkWidget *create_manager_menu (MenuWindow *menuwin)
     GtkWidget *search_button;
     GtkWidget *menu_button;
     GtkWidget *user_button;
+    GtkWidget *separator;
 
     table = gtk_grid_new();
     gtk_grid_set_column_homogeneous(GTK_GRID(table),TRUE);
     gtk_grid_set_row_spacing(GTK_GRID(table), 10);
     gtk_grid_set_column_spacing(GTK_GRID(table), 10);
 
-    GtkWidget *lable_space = gtk_separator_new (GTK_ORIENTATION_HORIZONTAL);
-    gtk_grid_attach(GTK_GRID(table) ,lable_space, 0, 0, 3, 1);
+    separator = gtk_separator_new (GTK_ORIENTATION_HORIZONTAL);
+    gtk_grid_attach(GTK_GRID(table) ,separator, 0, 0, 3, 1);
 
     search_button = set_button_style ("search","edit-find-symbolic");
     gtk_button_set_relief (GTK_BUTTON(search_button),GTK_RELIEF_NONE);
@@ -67,7 +68,7 @@ menu_window_fill (MenuWindow *menuwin)
     GtkWidget *frame;
     GtkWidget *hbox;
     GtkWidget *vbox;
-    GtkWidget *category_box,*app_vbox,*opt_box;
+    GtkWidget *category_box,*app_vbox;
     GtkWidget *toplevel;
     GdkScreen *screen;
     GdkVisual *visual;
@@ -83,7 +84,6 @@ menu_window_fill (MenuWindow *menuwin)
     gtk_container_add (GTK_CONTAINER (frame), hbox);
 
     vbox = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 0);
-    //gtk_container_add (GTK_CONTAINER (frame), vbox);
     gtk_box_pack_start (GTK_BOX (hbox), vbox, FALSE, FALSE, 0);
     
     toplevel = gtk_widget_get_toplevel (frame);

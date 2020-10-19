@@ -76,7 +76,7 @@ static void list_view_init(GtkWidget *list,int renderer_size,guint icon_size)
                        column);
 
     renderer_icon = gtk_cell_renderer_pixbuf_new();   //user icon
-    g_object_set (G_OBJECT(renderer_icon),"stock-size",icon_size);
+    g_object_set (G_OBJECT(renderer_icon),"stock-size",icon_size,NULL);
     gtk_tree_view_column_pack_start (column, renderer_icon, FALSE);
     gtk_tree_view_column_set_attributes (column,
                                          renderer_icon,
@@ -209,8 +209,8 @@ create_submenu (AppMenu          *menu,
                 MateMenuTreeDirectory *directory,
                 MateMenuTreeDirectory *alias_directory)
 {
+    
     GtkWidget *menuitem;
-    GtkWidget *submenu;
 
     if (alias_directory)
         menuitem = create_submenu_entry (menu, alias_directory);
@@ -222,14 +222,13 @@ create_submenu (AppMenu          *menu,
 static GtkWidget *
 create_item_context_menu (GtkWidget   *item)
 {
-    MateMenuTreeEntry     *entry;
-    MateMenuTreeDirectory *directory;
-    MateMenuTree          *tree;
+    //MateMenuTreeEntry     *entry;
+    //MateMenuTreeDirectory *directory;
+    //MateMenuTree          *tree;
     GtkWidget          *menu;
     GtkWidget          *submenu;
     GtkWidget          *menuitem;
-    const char         *menu_filename;
-    gboolean            id_lists_writable;
+    //const char         *menu_filename;
 
     menu = gtk_menu_new ();
     g_signal_connect (item, "destroy",
@@ -268,18 +267,21 @@ show_item_menu (GtkWidget      *item,
 {
     GtkWidget   *menu;
     GtkWidget   *window;
+    GtkWidget   *toplevel;
+    GdkScreen   *screen;
+    GdkVisual   *visual;
+    GtkStyleContext *context;
 
     menu = create_item_context_menu (item);
     window  = gtk_widget_get_toplevel (GTK_WIDGET (item));
     gtk_menu_set_screen (GTK_MENU (menu),gtk_window_get_screen (GTK_WINDOW (window)));
     /* Set up theme and transparency support */
-    GtkWidget *toplevel = gtk_widget_get_toplevel (menu);
+    toplevel = gtk_widget_get_toplevel (menu);
     /* Fix any failures of compiz/other wm's to communicate with gtk for transparency */
-    GdkScreen *screen = gtk_widget_get_screen (GTK_WIDGET (toplevel));
-    GdkVisual *visual = gdk_screen_get_rgba_visual (screen);
+    screen = gtk_widget_get_screen (GTK_WIDGET (toplevel));
+    visual = gdk_screen_get_rgba_visual (screen);
     gtk_widget_set_visual(GTK_WIDGET (toplevel), visual);
     /* Set menu and it's toplevel window to follow panel theme */
-    GtkStyleContext *context;
     context = gtk_widget_get_style_context (GTK_WIDGET (toplevel));
     gtk_style_context_add_class(context,"gnome-panel-menu-bar");
     gtk_style_context_add_class(context,"mate-panel-menu-bar");
@@ -300,12 +302,12 @@ menuitem_button_press_event (GtkWidget      *menuitem,
 static void
 grab_widget (GtkWidget *widget)
 {
-    g_return_if_fail (widget != NULL);
 
     GdkWindow *window;
     GdkDisplay *display;
     GdkSeat *seat;
 
+    g_return_if_fail (widget != NULL);
     window = gtk_widget_get_window (widget);
     display = gdk_window_get_display (window);
 
@@ -388,13 +390,11 @@ create_menuitem (AppMenu               *menu,
                  MateMenuTreeDirectory *alias_directory)
 {
     GDesktopAppInfo *ginfo;
-    const gchar* desc;
-    const gchar* gename;
-    const gchar* app_name;
+    //const gchar* app_name;
 
     ginfo = matemenu_tree_entry_get_app_info (entry);
-    desc= g_app_info_get_description(G_APP_INFO(ginfo));
-    gename = g_desktop_app_info_get_generic_name(ginfo);
+    //desc= g_app_info_get_description(G_APP_INFO(ginfo));
+    //gename = g_desktop_app_info_get_generic_name(ginfo);
 
     refresh_app_list_data (menu->subapp_tree,
                            g_app_info_get_name(G_APP_INFO(ginfo)),
@@ -408,8 +408,8 @@ static AppMenu *
 populate_menu_from_directory (AppMenu               *menu,
                               MateMenuTreeDirectory *directory)
 {
-    GList    *children;
-    gboolean  add_separator;
+    //GList    *children;
+    //gboolean  add_separator;
     MateMenuTreeIter *iter;
     MateMenuTreeItemType type;
 
@@ -532,14 +532,14 @@ static void view_submenu(GtkWidget *widget,  gpointer data)
 static void create_category_tree (AppMenu *menu)
 {
     GtkTreeSelection *selection;
-    GtkTreeModel      *model;
+    //GtkTreeModel      *model;
    
     menu->category_store = create_store ();
     menu->category_tree = create_empty_app_list (menu->category_store,210,menu->icon_size);
     gtk_tree_view_set_hover_selection (GTK_TREE_VIEW(menu->category_tree),TRUE);
     selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(menu->category_tree));
     gtk_tree_selection_set_mode(selection,GTK_SELECTION_SINGLE);
-    model=gtk_tree_view_get_model(GTK_TREE_VIEW(menu->category_tree));
+    //model=gtk_tree_view_get_model(GTK_TREE_VIEW(menu->category_tree));
     g_signal_connect(selection, 
                     "changed", 
                      G_CALLBACK(view_submenu), 
@@ -711,12 +711,13 @@ app_app_info_launch_uris (GDesktopAppInfo   *appinfo,
     GdkAppLaunchContext *context;
     GError              *local_error;
     gboolean             retval;
+    GdkDisplay          *display;
 
     g_return_val_if_fail (G_IS_DESKTOP_APP_INFO (appinfo), FALSE);
     g_return_val_if_fail (GDK_IS_SCREEN (screen), FALSE);
     g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
 
-    GdkDisplay *display = gdk_display_get_default ();
+    display = gdk_display_get_default ();
     context = gdk_display_get_app_launch_context (display);
     gdk_app_launch_context_set_screen (context, screen);
     gdk_app_launch_context_set_timestamp (context, timestamp);
@@ -840,7 +841,7 @@ static void switch_subapp (GtkWidget *widget,  gpointer data)
 }
 static void create_subapp_tree (AppMenu *menu)
 {
-    GtkTreeModel      *model;
+    //GtkTreeModel      *model;
     GtkTreeSelection *selection;
     static GtkTargetEntry menu_item_targets[] = {
              { "text/uri-list", 0, 0 }
@@ -851,7 +852,7 @@ static void create_subapp_tree (AppMenu *menu)
     gtk_tree_view_set_hover_selection (GTK_TREE_VIEW(menu->subapp_tree),TRUE);
     selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(menu->subapp_tree));
     gtk_tree_selection_set_mode(selection,GTK_SELECTION_SINGLE);
-    model=gtk_tree_view_get_model(GTK_TREE_VIEW(menu->subapp_tree));
+    //model=gtk_tree_view_get_model(GTK_TREE_VIEW(menu->subapp_tree));
 
     gtk_tree_view_set_activate_on_single_click (GTK_TREE_VIEW(menu->subapp_tree),TRUE);
     gtk_container_add (menu->container, menu->subapp_tree);
@@ -929,10 +930,10 @@ app_menu_changed (AppMenu       *menu,
     GtkCellRenderer   *renderer_icon;
 
     renderer_icon = g_object_get_data (G_OBJECT (menu->category_tree),"tree-list-renderer-icon");
-    g_object_set (G_OBJECT(renderer_icon),"stock-size",icon_size);
+    g_object_set (G_OBJECT(renderer_icon),"stock-size",icon_size,NULL);
 
     renderer_icon = g_object_get_data (G_OBJECT (menu->subapp_tree),"tree-list-renderer-icon");
-    g_object_set (G_OBJECT(renderer_icon),"stock-size",icon_size);
+    g_object_set (G_OBJECT(renderer_icon),"stock-size",icon_size,NULL);
 
     handle_matemenu_tree_changed (tree,menu);
 }
