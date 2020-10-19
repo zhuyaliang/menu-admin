@@ -1,0 +1,42 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the menu-admin package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: menu-admin\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2020-10-19 13:04+0800\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=CHARSET\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: src/app-menu.c:238
+msgid "Add this launcher to _panel"
+msgstr ""
+
+#: src/app-menu.c:242
+msgid "Add this launcher to _desktop"
+msgstr ""
+
+#: src/app-menu.c:249
+msgid "_Entire menu"
+msgstr ""
+
+#: src/app-menu.c:254
+msgid "Add this as _drawer to panel"
+msgstr ""
+
+#: src/app-menu.c:258
+msgid "Add this as _menu to panel"
+msgstr ""
+
+#: src/menu-window.c:54 src/menu-window.c:58
+msgid "more option"
+msgstr ""

@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gresources>
+  <gresource prefix="/org/gnome/nautilus">
+    <file>menu-admin-function-manager.ui</file>
+  </gresource>
+</gresources>
