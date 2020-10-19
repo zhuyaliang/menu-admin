@@ -6,6 +6,7 @@
 #include "menu-window.h"
 #include "app-menu.h"
 #include "app-util.h"
+#include "config.h"
 
 
 struct _MenuWindowPrivate 
@@ -33,15 +34,7 @@ static void set_box_background (GtkWidget *box)
     g_free (css);
 }
 static void
-change_label_button (GSimpleAction *action,
-                     GVariant      *parameter,
-                     gpointer       user_data)
-{
-    g_print("Text set from button\r\n");
-}
-
-static void
-normal_menu_item (GSimpleAction *action,
+menu_admin_settings (GSimpleAction *action,
                   GVariant      *parameter,
                   gpointer       user_data)
 {
@@ -49,43 +42,38 @@ normal_menu_item (GSimpleAction *action,
 }
 
 static void
-toggle_menu_item (GSimpleAction *action,
+menu_admin_about (GSimpleAction *action,
                   GVariant      *parameter,
                   gpointer       user_data)
 {
+    
+    GtkWindow *parent = GTK_WINDOW (user_data);
 
-  g_print ("Text set from toggle menu item\r\n");
+    static const gchar* artists[] = {
+         "zhuyaliang <15132211195@163.com>",
+         NULL
+     };
+    static const gchar* authors[] = {
+         "Yaliang Zhu <15132211195@163.com>",
+         NULL
+    };
+
+    gtk_show_about_dialog (parent,
+                           "authors", authors,
+                           "artists", artists,
+                           "translator-credits", _("translator-credits"),
+                           "comments", _("applications menu admin"),
+                           "copyright", "Copyright © 2020 zhuyaliang",
+                           "license-type", GTK_LICENSE_GPL_3_0,
+                           "logo-icon-name", "org.gnome.Logs",
+                           "version", PACKAGE_VERSION,
+                           "website", PACKAGE_NAME, NULL);
+
 }
-
-static void
-submenu_item (GSimpleAction *action,
-              GVariant      *parameter,
-              gpointer       user_data)
-{
-    g_print ("Text set from submenu item\r\n");
-}
-
-static void
-radio (GSimpleAction *action, GVariant *parameter, gpointer user_data)
-{
-  GVariant *new_state = g_variant_new_string (g_variant_get_string (parameter, NULL));
-  char *str;
-
-  str = g_strdup_printf ("From Radio menu item %s",
-                         g_variant_get_string (new_state, NULL));
-
-  g_print ("str = %s\r\n",str);
-
-  g_free (str);
-}
-
 
 static const GActionEntry actions[] = {
-  { "change-label-button", change_label_button, NULL, NULL, NULL },
-  { "normal-menu-item",    normal_menu_item,    NULL, NULL, NULL },
-  { "toggle-menu-item",    toggle_menu_item,    NULL, "true", NULL },
-  { "submenu-item",        submenu_item,        NULL, NULL, NULL },
-  { "radio",               radio,               "s", "1", NULL },
+  { "menu-admin-about", menu_admin_about},
+  { "menu-admin-settings", menu_admin_settings}
 };
 
 static GtkWidget *create_menu_button (MenuWindow *menuwin)
@@ -107,12 +95,10 @@ static GtkWidget *create_menu_button (MenuWindow *menuwin)
                                      G_N_ELEMENTS (actions),
                                      NULL);
 
-    gtk_widget_insert_action_group (GTK_WIDGET(menuwin), "menuwin", G_ACTION_GROUP (action_group));
-    gtk_widget_set_halign (menu_button, GTK_ALIGN_CENTER);
+    gtk_widget_insert_action_group (GTK_WIDGET(menuwin), "win", G_ACTION_GROUP (action_group));
   
     builder = gtk_builder_new_from_resource ("/org/admin/menu/menu-admin-function-manager.ui");
     menu_model = G_MENU_MODEL (gtk_builder_get_object (builder, "menu_model"));
-
     gtk_menu_button_set_menu_model (GTK_MENU_BUTTON (menu_button), menu_model);
 
     return menu_button;

@@ -2,3 +2,4 @@ src/app-menu.c
 src/app-util.c  
 src/main.c  
 src/menu-window.c
+src/resources/menu-admin-function-manager.ui
