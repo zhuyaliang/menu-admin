@@ -1,3 +1,4 @@
+subdir('icons')
 i18n = import('i18n')
 
 appdata = 'org.menuadmin.gschema.xml'

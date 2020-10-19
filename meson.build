@@ -4,7 +4,8 @@ project('menu-admin', 'c',
   meson_version : '>=0.40.1',
   default_options : [ 'warning_level=1', 'buildtype=debugoptimized', 'c_std=gnu11'],
   )
-
+ma_prefix = get_option('prefix')
+ma_datadir = join_paths(ma_prefix, get_option('datadir'))
 # Compiler & Project arguments
 add_project_arguments([
   '-DHAVE_CONFIG_H',
@@ -95,6 +96,7 @@ polkit_deps = dependency('polkit-gobject-1')
 conf = configuration_data()
 conf.set_quoted('VERSION', meson.project_version())
 conf.set_quoted('PACKAGE_NAME', meson.project_name())
+conf.set_quoted('PACKAGE_URL','https://github.com/zhuyaliang/menu-admin')
 conf.set_quoted('PACKAGE_VERSION', meson.project_version())
 conf.set_quoted('GETTEXT_PACKAGE', meson.project_name())
 conf.set_quoted('LUNAR_CALENDAR_LOCALEDIR', join_paths(get_option('prefix'), get_option('localedir')))

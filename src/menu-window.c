@@ -65,9 +65,9 @@ menu_admin_about (GSimpleAction *action,
                            "comments", _("applications menu admin"),
                            "copyright", "Copyright © 2020 zhuyaliang",
                            "license-type", GTK_LICENSE_GPL_3_0,
-                           "logo-icon-name", "org.gnome.Logs",
+                           "logo-icon-name", "menu-admin",
                            "version", PACKAGE_VERSION,
-                           "website", PACKAGE_NAME, NULL);
+                           "website", PACKAGE_URL, NULL);
 
 }
 
