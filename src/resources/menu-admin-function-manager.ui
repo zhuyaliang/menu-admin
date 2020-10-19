@@ -1,39 +1,39 @@
 <?xml version="1.0"?>
-<interface>"
-  <menu id=\"menu_model\">"
-    <section>"
-      <item>"
-        <attribute name=\"label\">Normal Menu Item</attribute>"
-        <attribute name=\"action\">win.normal-menu-item</attribute>"
-      </item>"
-      <submenu>"
-        <attribute name=\"label\">Submenu</attribute>"
-        <item>"
-          <attribute name=\"label\">Submenu Item</attribute>"
-          <attribute name=\"action\">win.submenu-item</attribute>"
-        </item>"
-      </submenu>"
-      <item>"
-        <attribute name=\"label\">Toggle Menu Item</attribute>"
-        <attribute name=\"action\">win.toggle-menu-item</attribute>"
-      </item>"
-    </section>"
-    <section>"
-      <item>"
-        <attribute name=\"label\">Radio 1</attribute>"
-        <attribute name=\"action\">win.radio</attribute>"
-        <attribute name=\"target\">1</attribute>"
-      </item>"
-      <item>"
-        <attribute name=\"label\">Radio 2</attribute>"
-        <attribute name=\"action\">win.radio</attribute>"
-        <attribute name=\"target\">2</attribute>"
-      </item>"
-      <item>"
-        <attribute name=\"label\">Radio 3</attribute>"
-        <attribute name=\"action\">win.radio</attribute>"
-        <attribute name=\"target\">3</attribute>"
-      </item>"
-    </section>"
-  </menu>"
-</interface>"
+<interface>
+  <menu id="menu_model">
+    <section>
+      <item>
+        <attribute name="label">Normal Menu Item</attribute>
+        <attribute name="action">win.normal-menu-item</attribute>
+      </item>
+      <submenu>
+        <attribute name="label">Submenu</attribute>
+        <item>
+          <attribute name="label">Submenu Item</attribute>
+          <attribute name="action">win.submenu-item</attribute>
+        </item>
+      </submenu>
+      <item>
+        <attribute name="label">Toggle Menu Item</attribute>
+        <attribute name="action">win.toggle-menu-item</attribute>
+      </item>
+    </section>
+    <section>
+      <item>
+        <attribute name="label">Radio 1</attribute>
+        <attribute name="action">win.radio</attribute>
+        <attribute name="target">1</attribute>
+      </item>
+      <item>
+        <attribute name="label">Radio 2</attribute>
+        <attribute name="action">win.radio</attribute>
+        <attribute name="target">2</attribute>
+      </item>
+      <item>
+        <attribute name="label">Radio 3</attribute>
+        <attribute name="action">win.radio</attribute>
+        <attribute name="target">3</attribute>
+      </item>
+    </section>
+  </menu>
+</interface>

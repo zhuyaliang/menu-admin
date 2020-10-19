@@ -7,7 +7,7 @@ resources = gnome.compile_resources(
   ),
   source_dir: 'resources',
   c_name: 'nautilus',
-  extra_args: '--manual-register'
+  extra_args: '--generate-source'
 )
 
 

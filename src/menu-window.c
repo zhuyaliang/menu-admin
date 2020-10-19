@@ -32,6 +32,91 @@ static void set_box_background (GtkWidget *box)
     g_object_unref (provider);
     g_free (css);
 }
+static void
+change_label_button (GSimpleAction *action,
+                     GVariant      *parameter,
+                     gpointer       user_data)
+{
+    g_print("Text set from button\r\n");
+}
+
+static void
+normal_menu_item (GSimpleAction *action,
+                  GVariant      *parameter,
+                  gpointer       user_data)
+{
+  g_print ("Text set from normal menu item\r\n");
+}
+
+static void
+toggle_menu_item (GSimpleAction *action,
+                  GVariant      *parameter,
+                  gpointer       user_data)
+{
+
+  g_print ("Text set from toggle menu item\r\n");
+}
+
+static void
+submenu_item (GSimpleAction *action,
+              GVariant      *parameter,
+              gpointer       user_data)
+{
+    g_print ("Text set from submenu item\r\n");
+}
+
+static void
+radio (GSimpleAction *action, GVariant *parameter, gpointer user_data)
+{
+  GVariant *new_state = g_variant_new_string (g_variant_get_string (parameter, NULL));
+  char *str;
+
+  str = g_strdup_printf ("From Radio menu item %s",
+                         g_variant_get_string (new_state, NULL));
+
+  g_print ("str = %s\r\n",str);
+
+  g_free (str);
+}
+
+
+static const GActionEntry actions[] = {
+  { "change-label-button", change_label_button, NULL, NULL, NULL },
+  { "normal-menu-item",    normal_menu_item,    NULL, NULL, NULL },
+  { "toggle-menu-item",    toggle_menu_item,    NULL, "true", NULL },
+  { "submenu-item",        submenu_item,        NULL, NULL, NULL },
+  { "radio",               radio,               "s", "1", NULL },
+};
+
+static GtkWidget *create_menu_button (MenuWindow *menuwin)
+{
+    GtkWidget  *menu_button;
+    GtkWidget  *image;
+    GMenuModel *menu_model;
+    GtkBuilder *builder;
+    GSimpleActionGroup *action_group;
+
+    menu_button = gtk_menu_button_new ();
+    image  = gtk_image_new_from_icon_name ("open-menu-symbolic", GTK_ICON_SIZE_BUTTON);
+    gtk_button_set_image (GTK_BUTTON (menu_button), image);
+    gtk_button_set_relief (GTK_BUTTON(menu_button),GTK_RELIEF_NONE);
+    
+    action_group = g_simple_action_group_new (); 
+    g_action_map_add_action_entries (G_ACTION_MAP (action_group),
+                                     actions,
+                                     G_N_ELEMENTS (actions),
+                                     NULL);
+
+    gtk_widget_insert_action_group (GTK_WIDGET(menuwin), "menuwin", G_ACTION_GROUP (action_group));
+    gtk_widget_set_halign (menu_button, GTK_ALIGN_CENTER);
+  
+    builder = gtk_builder_new_from_resource ("/org/admin/menu/menu-admin-function-manager.ui");
+    menu_model = G_MENU_MODEL (gtk_builder_get_object (builder, "menu_model"));
+
+    gtk_menu_button_set_menu_model (GTK_MENU_BUTTON (menu_button), menu_model);
+
+    return menu_button;
+}
 static GtkWidget *create_manager_menu (MenuWindow *menuwin)
 {
     GtkWidget *table;
@@ -48,15 +133,15 @@ static GtkWidget *create_manager_menu (MenuWindow *menuwin)
     separator = gtk_separator_new (GTK_ORIENTATION_HORIZONTAL);
     gtk_grid_attach(GTK_GRID(table) ,separator, 0, 0, 3, 1);
 
-    search_button = set_button_style ("search","edit-find-symbolic");
+    search_button = set_button_style ("edit-find-symbolic");
     gtk_button_set_relief (GTK_BUTTON(search_button),GTK_RELIEF_NONE);
     gtk_grid_attach(GTK_GRID(table), search_button, 0, 1, 1, 1);
 
-    menu_button = set_button_style (_("more option"),"open-menu-symbolic");
-    gtk_button_set_relief (GTK_BUTTON(menu_button),GTK_RELIEF_NONE);
+    menu_button = create_menu_button (menuwin);
+    
     gtk_grid_attach(GTK_GRID(table), menu_button, 1, 1, 1, 1);
 
-    user_button = set_button_style (_("more option"),"avatar-default-symbolic");
+    user_button = set_button_style ("avatar-default-symbolic");
     gtk_button_set_relief (GTK_BUTTON(user_button),GTK_RELIEF_NONE);
     gtk_grid_attach(GTK_GRID(table), user_button, 2, 1, 1, 1);
 

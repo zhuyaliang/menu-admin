@@ -86,7 +86,7 @@ void menu_util_set_tooltip_text (GtkWidget  *widget,
                           (GClosureNotify) G_CALLBACK (g_free),
                            0);
 }
-GtkWidget *set_button_style(const gchar *button_text,const gchar *icon_name)
+GtkWidget *set_button_style(const gchar *icon_name)
 {
     GtkWidget *button;
     GtkWidget *image;
