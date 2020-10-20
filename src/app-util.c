@@ -91,9 +91,8 @@ GtkWidget *set_button_style(const gchar *icon_name)
     GtkWidget *button;
     GtkWidget *image;
 
-    button = gtk_button_new ();
+    button = gtk_toggle_button_new ();
     image  = gtk_image_new_from_icon_name (icon_name, GTK_ICON_SIZE_BUTTON);
     gtk_button_set_image (GTK_BUTTON (button), image);
-
     return button;
 }

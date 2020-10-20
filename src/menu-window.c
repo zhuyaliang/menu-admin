@@ -103,12 +103,31 @@ static GtkWidget *create_menu_button (MenuWindow *menuwin)
 
     return menu_button;
 }
+static GtkWidget *create_search_bar (MenuWindow *menuwin)
+{
+    GtkWidget *entry;
+    GtkWidget *container;
+    GtkWidget *searchbar;
+
+    entry = gtk_search_entry_new ();
+    container = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 10);
+    gtk_widget_set_halign (container, GTK_ALIGN_CENTER);
+    gtk_box_pack_start (GTK_BOX (container), entry, FALSE, FALSE, 0);
+
+    searchbar = gtk_search_bar_new ();
+    gtk_search_bar_connect_entry (GTK_SEARCH_BAR (searchbar), GTK_ENTRY (entry));
+    gtk_search_bar_set_show_close_button (GTK_SEARCH_BAR (searchbar), FALSE);
+    gtk_container_add (GTK_CONTAINER (searchbar), container);
+
+    return searchbar;
+}
 static GtkWidget *create_manager_menu (MenuWindow *menuwin)
 {
     GtkWidget *table;
     GtkWidget *search_button;
     GtkWidget *menu_button;
     GtkWidget *user_button;
+    GtkWidget *searchbar;
     GtkWidget *separator;
 
     table = gtk_grid_new();
@@ -124,12 +143,20 @@ static GtkWidget *create_manager_menu (MenuWindow *menuwin)
     gtk_grid_attach(GTK_GRID(table), search_button, 0, 1, 1, 1);
 
     menu_button = create_menu_button (menuwin);
-    
     gtk_grid_attach(GTK_GRID(table), menu_button, 1, 1, 1, 1);
 
     user_button = set_button_style ("avatar-default-symbolic");
     gtk_button_set_relief (GTK_BUTTON(user_button),GTK_RELIEF_NONE);
     gtk_grid_attach(GTK_GRID(table), user_button, 2, 1, 1, 1);
+
+    searchbar = create_search_bar (menuwin);
+    gtk_grid_attach(GTK_GRID(table), searchbar, 0, 2, 3, 1);
+
+    g_object_bind_property (search_button,
+                           "active",
+                            searchbar,
+                           "search-mode-enabled",
+                            G_BINDING_BIDIRECTIONAL);
 
     return table;
 }
