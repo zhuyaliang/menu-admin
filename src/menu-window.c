@@ -121,7 +121,19 @@ static GtkWidget *create_search_bar (MenuWindow *menuwin)
 
     return searchbar;
 }
-static GtkWidget *create_manager_menu (MenuWindow *menuwin)
+int f = 2;
+static void
+set_visible_child (GtkWidget *button, gpointer data)
+{
+    if (f%2 == 0)
+        gtk_stack_set_visible_child_name (GTK_STACK (data),"w2");
+    else
+        gtk_stack_set_visible_child_name (GTK_STACK (data),"w1");
+    f++;
+}
+
+
+static GtkWidget *create_manager_menu (MenuWindow *menuwin,GtkWidget *stack)
 {
     GtkWidget *table;
     GtkWidget *search_button;
@@ -152,6 +164,7 @@ static GtkWidget *create_manager_menu (MenuWindow *menuwin)
     searchbar = create_search_bar (menuwin);
     gtk_grid_attach(GTK_GRID(table), searchbar, 0, 2, 3, 1);
 
+    g_signal_connect (search_button, "clicked", (GCallback) set_visible_child,stack);
     g_object_bind_property (search_button,
                            "active",
                             searchbar,
@@ -160,20 +173,61 @@ static GtkWidget *create_manager_menu (MenuWindow *menuwin)
 
     return table;
 }
+
+static GtkWidget *create_menu_box_page (MenuWindow *menuwin)
+{
+    GtkWidget *vbox;
+    GtkWidget *scroll;
+    GtkWidget *category_box,*app_vbox;
+
+    vbox = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 0);
+
+    category_box = gtk_box_new (GTK_ORIENTATION_VERTICAL, 0);
+    gtk_box_pack_start (GTK_BOX (vbox), category_box,FALSE,FALSE,0);
+
+    app_vbox = gtk_box_new (GTK_ORIENTATION_VERTICAL, 0);
+    gtk_box_pack_start (GTK_BOX (vbox), app_vbox,FALSE,FALSE,0);
+
+    scroll = gtk_scrolled_window_new (NULL, NULL);
+    gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (scroll),
+                                    GTK_POLICY_NEVER,
+                                    GTK_POLICY_AUTOMATIC);
+    gtk_box_pack_start (GTK_BOX (app_vbox), scroll, TRUE, TRUE, 0);
+    gtk_widget_show_all (vbox);
+    menuwin->priv->menu = create_applications_menu ("mate-applications.menu",
+                                                     GTK_CONTAINER(scroll),
+                                                     GTK_BOX(category_box));
+    return vbox;
+}
+
+static GtkWidget *create_search_box_page (MenuWindow *menuwin)
+{
+    GtkWidget *box;
+    GtkWidget *label;
+
+    box = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 0);
+    label = gtk_label_new ("Gazoooooooooooooooonk");
+    gtk_box_pack_start (GTK_BOX (box), label, TRUE, TRUE, 0);
+
+    gtk_widget_show_all (box);
+
+    return box;
+}
 static void
 menu_window_fill (MenuWindow *menuwin)
 {
     GtkWidget *frame;
     GtkWidget *hbox;
-    GtkWidget *vbox;
-    GtkWidget *category_box,*app_vbox;
+    GtkWidget *stack;
+    GtkWidget *menu_box;
+    GtkWidget *search_box;
     GtkWidget *toplevel;
     GdkScreen *screen;
     GdkVisual *visual;
-    GtkWidget *scroll;
     GtkWidget *table;
 
     set_box_background (GTK_WIDGET (menuwin));
+
     frame = gtk_frame_new (NULL);
     gtk_frame_set_shadow_type (GTK_FRAME (frame), GTK_SHADOW_OUT);
     gtk_container_add (GTK_CONTAINER (menuwin), frame);
@@ -181,29 +235,24 @@ menu_window_fill (MenuWindow *menuwin)
     hbox = gtk_box_new (GTK_ORIENTATION_VERTICAL, 0);
     gtk_container_add (GTK_CONTAINER (frame), hbox);
 
-    vbox = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 0);
-    gtk_box_pack_start (GTK_BOX (hbox), vbox, FALSE, FALSE, 0);
-    
+    stack = gtk_stack_new ();
+    gtk_box_pack_start (GTK_BOX (hbox), stack, FALSE, FALSE, 0);
+    gtk_widget_show_all (frame);
+
     toplevel = gtk_widget_get_toplevel (frame);
     screen = gtk_widget_get_screen(GTK_WIDGET(toplevel));
     visual = gdk_screen_get_rgba_visual(screen);
     gtk_widget_set_visual(GTK_WIDGET(toplevel), visual);
-    
-    category_box = gtk_box_new (GTK_ORIENTATION_VERTICAL, 0);
-    gtk_box_pack_start (GTK_BOX (vbox), category_box,FALSE,FALSE,0);
-    
-    app_vbox = gtk_box_new (GTK_ORIENTATION_VERTICAL, 0);
-    gtk_box_pack_start (GTK_BOX (vbox), app_vbox,FALSE,FALSE,0);
-    scroll = gtk_scrolled_window_new (NULL, NULL);
-    gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (scroll),
-                                    GTK_POLICY_NEVER, 
-                                    GTK_POLICY_AUTOMATIC);
-    gtk_box_pack_start (GTK_BOX (app_vbox), scroll, TRUE, TRUE, 0);
-    table = create_manager_menu (menuwin);
-    gtk_box_pack_start(GTK_BOX(hbox),table, TRUE, TRUE,0);
 
-    gtk_widget_show_all (frame);
-    menuwin->priv->menu = create_applications_menu ("mate-applications.menu",GTK_CONTAINER(scroll),GTK_BOX(category_box));
+    menu_box = create_menu_box_page (menuwin);
+    gtk_stack_add_named (GTK_STACK (stack),menu_box,"w1");
+
+    search_box = create_search_box_page (menuwin);
+    gtk_stack_add_named (GTK_STACK (stack),search_box,"w2");
+
+    table = create_manager_menu (menuwin,stack);
+    gtk_box_pack_start(GTK_BOX(hbox),table, TRUE, TRUE,0);
+    gtk_widget_show_all (table);
 }
 
 static GObject *
