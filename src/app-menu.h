@@ -14,4 +14,5 @@ AppMenu        *create_applications_menu     (const char    *menu_file,
                                               GtkContainer *container,
                                               GtkBox       *box);
 
+GtkWidget *get_menu_app_tree (AppMenu *menu);
 #endif

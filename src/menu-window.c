@@ -203,11 +203,15 @@ static GtkWidget *create_menu_box_page (MenuWindow *menuwin)
 static GtkWidget *create_search_box_page (MenuWindow *menuwin)
 {
     GtkWidget *box;
-    GtkWidget *label;
+    GtkWidget *scroll;
+    GtkWidget *app_tree;
 
     box = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 0);
-    label = gtk_label_new ("Gazoooooooooooooooonk");
-    gtk_box_pack_start (GTK_BOX (box), label, TRUE, TRUE, 0);
+    scroll = gtk_scrolled_window_new (NULL, NULL);
+    gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (scroll),
+                                    GTK_POLICY_NEVER,
+                                    GTK_POLICY_AUTOMATIC);
+    gtk_box_pack_start (GTK_BOX (box), scroll, TRUE, TRUE, 0);
 
     gtk_widget_show_all (box);
 
