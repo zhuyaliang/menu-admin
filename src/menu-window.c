@@ -103,6 +103,19 @@ static GtkWidget *create_menu_button (MenuWindow *menuwin)
 
     return menu_button;
 }
+static void
+search_changed_cb (GtkSearchEntry *entry,
+                   MenuWindow     *menuwin)
+{
+    const char   *text;
+    GtkListStore *search_store;
+
+    text = gtk_entry_get_text (GTK_ENTRY (entry));
+    search_store = get_menu_app_search_store (menuwin->priv->menu);
+    if (search_store != NULL)
+        gtk_list_store_clear (search_store);
+    view_search_app_results (menuwin->priv->menu,text);
+}
 static GtkWidget *create_search_bar (MenuWindow *menuwin)
 {
     GtkWidget *entry;
@@ -118,20 +131,27 @@ static GtkWidget *create_search_bar (MenuWindow *menuwin)
     gtk_search_bar_connect_entry (GTK_SEARCH_BAR (searchbar), GTK_ENTRY (entry));
     gtk_search_bar_set_show_close_button (GTK_SEARCH_BAR (searchbar), FALSE);
     gtk_container_add (GTK_CONTAINER (searchbar), container);
-
+    g_signal_connect (entry,
+                     "search-changed",
+                      G_CALLBACK (search_changed_cb),
+                      menuwin);
     return searchbar;
 }
-int f = 2;
 static void
-set_visible_child (GtkWidget *button, gpointer data)
+set_visible_child (GtkToggleButton *button, gpointer data)
 {
-    if (f%2 == 0)
-        gtk_stack_set_visible_child_name (GTK_STACK (data),"w2");
-    else
-        gtk_stack_set_visible_child_name (GTK_STACK (data),"w1");
-    f++;
-}
+    gboolean active;
 
+    active = gtk_toggle_button_get_active (button);
+    if (!active)
+    {
+        gtk_stack_set_visible_child_name (GTK_STACK (data),"menu-page");
+    }
+    else
+    {
+        gtk_stack_set_visible_child_name (GTK_STACK (data),"search-page");
+    }
+}
 
 static GtkWidget *create_manager_menu (MenuWindow *menuwin,GtkWidget *stack)
 {
@@ -164,7 +184,7 @@ static GtkWidget *create_manager_menu (MenuWindow *menuwin,GtkWidget *stack)
     searchbar = create_search_bar (menuwin);
     gtk_grid_attach(GTK_GRID(table), searchbar, 0, 2, 3, 1);
 
-    g_signal_connect (search_button, "clicked", (GCallback) set_visible_child,stack);
+    g_signal_connect (search_button, "toggled", (GCallback) set_visible_child,stack);
     g_object_bind_property (search_button,
                            "active",
                             searchbar,
@@ -204,7 +224,7 @@ static GtkWidget *create_search_box_page (MenuWindow *menuwin)
 {
     GtkWidget *box;
     GtkWidget *scroll;
-    GtkWidget *app_tree;
+    GtkWidget *search_tree;
 
     box = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 0);
     scroll = gtk_scrolled_window_new (NULL, NULL);
@@ -212,6 +232,8 @@ static GtkWidget *create_search_box_page (MenuWindow *menuwin)
                                     GTK_POLICY_NEVER,
                                     GTK_POLICY_AUTOMATIC);
     gtk_box_pack_start (GTK_BOX (box), scroll, TRUE, TRUE, 0);
+    search_tree = get_menu_app_search_tree (menuwin->priv->menu);
+    gtk_container_add (GTK_CONTAINER (scroll), search_tree);
 
     gtk_widget_show_all (box);
 
@@ -249,10 +271,10 @@ menu_window_fill (MenuWindow *menuwin)
     gtk_widget_set_visual(GTK_WIDGET(toplevel), visual);
 
     menu_box = create_menu_box_page (menuwin);
-    gtk_stack_add_named (GTK_STACK (stack),menu_box,"w1");
+    gtk_stack_add_named (GTK_STACK (stack),menu_box,"menu-page");
 
     search_box = create_search_box_page (menuwin);
-    gtk_stack_add_named (GTK_STACK (stack),search_box,"w2");
+    gtk_stack_add_named (GTK_STACK (stack),search_box,"search-page");
 
     table = create_manager_menu (menuwin,stack);
     gtk_box_pack_start(GTK_BOX(hbox),table, TRUE, TRUE,0);

@@ -17,10 +17,10 @@ struct _AppMenu
     GtkBox       *box;    
     GtkWidget    *category_tree;
     GtkWidget    *subapp_tree;
+    GtkWidget    *search_tree;
     GtkListStore *category_store;
     GtkListStore *subapp_store;
     GtkListStore *search_store;
-    GtkWidget    *search_tree;
 
     GHashTable   *app_hash;
     GSettings    *settings;
@@ -1094,13 +1094,49 @@ AppMenu *app_menu_new (void)
     return menu;
 }
 
-GtkWidget *get_menu_app_tree (AppMenu *menu)
+GtkWidget *get_menu_app_search_tree (AppMenu *menu)
 {
     if (APP_MENU (menu))
     {
         return menu->search_tree;
     }
     return NULL;
+}
+GtkListStore *get_menu_app_search_store (AppMenu *menu)
+{
+    if (APP_MENU (menu))
+    {
+        return menu->search_store;
+    }
+    return NULL;
+}
+int view_search_app_results (AppMenu *menu,const char *text)
+{
+    int count = 0;
+    GHashTableIter iter;
+    gpointer key, value;
+    GDesktopAppInfo *ginfo;
+
+    if (strlen (text) <= 1)
+        return count;
+    g_hash_table_iter_init (&iter, menu->app_hash);
+    while (g_hash_table_iter_next (&iter, &key, &value))
+    {
+        if (strstr((char*)key,text) != NULL)
+        {
+            g_print ("key = %s\r\n",(char*)key);
+            ginfo = matemenu_tree_entry_get_app_info ((MateMenuTreeEntry*)value);
+            refresh_app_list_data (menu->search_tree,
+                                  (char*)key,
+                                   g_app_info_get_icon(G_APP_INFO(ginfo)),
+                                   NULL,
+                                   menu->font_size,
+                                  value);
+            count++;
+        }
+
+    }
+    return count;
 }
 AppMenu *
 create_applications_menu (const char   *menu_file,
