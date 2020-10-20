@@ -12,6 +12,7 @@
 struct _MenuWindowPrivate 
 {
     AppMenu    *menu;
+    GtkWidget  *stack;
     GSettings  *settings;
 };
 
@@ -114,7 +115,8 @@ search_changed_cb (GtkSearchEntry *entry,
     search_store = get_menu_app_search_store (menuwin->priv->menu);
     if (search_store != NULL)
         gtk_list_store_clear (search_store);
-    view_search_app_results (menuwin->priv->menu,text);
+    if (view_search_app_results (menuwin->priv->menu,text) != 0 )
+        gtk_stack_set_visible_child_name (GTK_STACK (menuwin->priv->stack),"search-page");
 }
 static GtkWidget *create_search_bar (MenuWindow *menuwin)
 {
@@ -147,10 +149,6 @@ set_visible_child (GtkToggleButton *button, gpointer data)
     {
         gtk_stack_set_visible_child_name (GTK_STACK (data),"menu-page");
     }
-    else
-    {
-        gtk_stack_set_visible_child_name (GTK_STACK (data),"search-page");
-    }
 }
 
 static GtkWidget *create_manager_menu (MenuWindow *menuwin,GtkWidget *stack)
@@ -171,13 +169,16 @@ static GtkWidget *create_manager_menu (MenuWindow *menuwin,GtkWidget *stack)
     gtk_grid_attach(GTK_GRID(table) ,separator, 0, 0, 3, 1);
 
     search_button = set_button_style ("edit-find-symbolic");
+    gtk_widget_set_tooltip_text (search_button,_("Search for applications in the menu"));
     gtk_button_set_relief (GTK_BUTTON(search_button),GTK_RELIEF_NONE);
     gtk_grid_attach(GTK_GRID(table), search_button, 0, 1, 1, 1);
 
     menu_button = create_menu_button (menuwin);
+    gtk_widget_set_tooltip_text (menu_button,_("Click to see more features"));
     gtk_grid_attach(GTK_GRID(table), menu_button, 1, 1, 1, 1);
 
     user_button = set_button_style ("avatar-default-symbolic");
+    gtk_widget_set_tooltip_text (user_button,_("View current user information"));
     gtk_button_set_relief (GTK_BUTTON(user_button),GTK_RELIEF_NONE);
     gtk_grid_attach(GTK_GRID(table), user_button, 2, 1, 1, 1);
 
@@ -278,6 +279,7 @@ menu_window_fill (MenuWindow *menuwin)
 
     table = create_manager_menu (menuwin,stack);
     gtk_box_pack_start(GTK_BOX(hbox),table, TRUE, TRUE,0);
+    menuwin->priv->stack = stack;
     gtk_widget_show_all (table);
 }
 

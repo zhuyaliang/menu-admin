@@ -1124,7 +1124,6 @@ int view_search_app_results (AppMenu *menu,const char *text)
     {
         if (strstr((char*)key,text) != NULL)
         {
-            g_print ("key = %s\r\n",(char*)key);
             ginfo = matemenu_tree_entry_get_app_info ((MateMenuTreeEntry*)value);
             refresh_app_list_data (menu->search_tree,
                                   (char*)key,
