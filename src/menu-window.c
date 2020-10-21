@@ -81,26 +81,24 @@ static GtkWidget *create_menu_button (MenuWindow *menuwin)
 {
     GtkWidget  *menu_button;
     GtkWidget  *image;
-    GMenuModel *menu_model;
     GtkBuilder *builder;
+    GtkWidget  *popover;
     GSimpleActionGroup *action_group;
 
     menu_button = gtk_menu_button_new ();
     image  = gtk_image_new_from_icon_name ("open-menu-symbolic", GTK_ICON_SIZE_BUTTON);
     gtk_button_set_image (GTK_BUTTON (menu_button), image);
     gtk_button_set_relief (GTK_BUTTON(menu_button),GTK_RELIEF_NONE);
-    
-    action_group = g_simple_action_group_new (); 
+    action_group = g_simple_action_group_new ();
     g_action_map_add_action_entries (G_ACTION_MAP (action_group),
                                      actions,
                                      G_N_ELEMENTS (actions),
                                      NULL);
 
     gtk_widget_insert_action_group (GTK_WIDGET(menuwin), "win", G_ACTION_GROUP (action_group));
-  
     builder = gtk_builder_new_from_resource ("/org/admin/menu/menu-admin-function-manager.ui");
-    menu_model = G_MENU_MODEL (gtk_builder_get_object (builder, "menu_model"));
-    gtk_menu_button_set_menu_model (GTK_MENU_BUTTON (menu_button), menu_model);
+    popover = (GtkWidget *)gtk_builder_get_object (builder, "popover");
+    gtk_menu_button_set_popover (GTK_MENU_BUTTON (menu_button), popover);
 
     return menu_button;
 }

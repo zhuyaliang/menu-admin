@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: menu-admin\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-10-20 17:52+0800\n"
-"PO-Revision-Date: 2020-10-20 17:56+0800\n"
+"POT-Creation-Date: 2020-10-21 13:36+0800\n"
+"PO-Revision-Date: 2020-10-21 13:36+0800\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: none\n"
 "Language: zh_CN\n"
@@ -44,27 +44,28 @@ msgstr "翻译"
 
 #: src/menu-window.c:66
 msgid "applications menu admin"
-msgstr ""
-"applications menu admin\n"
-"applications menu admin\n"
-"应用程序菜单管理"
+msgstr "应用程序菜单管理"
 
-#: src/menu-window.c:172
+#: src/menu-window.c:170
 msgid "Search for applications in the menu"
 msgstr "搜索菜单中的应用程序"
 
-#: src/menu-window.c:177
+#: src/menu-window.c:175
 msgid "Click to see more features"
 msgstr "点击查看更多功能"
 
-#: src/menu-window.c:181
+#: src/menu-window.c:179
 msgid "View current user information"
 msgstr "查看当前用户信息"
 
-#: src/resources/menu-admin-function-manager.ui:6
+#: src/resources/menu-admin-function-manager.ui:33
 msgid "About"
 msgstr "关于"
 
-#: src/resources/menu-admin-function-manager.ui:11
-msgid "settings"
+#: src/resources/menu-admin-function-manager.ui:73
+msgid "Settings"
 msgstr "设置"
+
+#: src/resources/menu-admin-function-manager.ui:113
+msgid "Time"
+msgstr "时间"
