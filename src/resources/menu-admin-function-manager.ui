@@ -121,31 +121,45 @@
           </object>
         </child>
         <child>
-          <object class="GtkModelButton">
+          <object class="GtkBox">
             <property name="visible">True</property>
-            <property name="text">Submenu 1</property>
-            <property name="menu-name">submenu1</property>
-          </object>
-        </child>  
-      </object>
-    </child>
-	 
-    <child>
-      <object class="GtkBox">
-        <property name="visible">True</property>
-        <property name="orientation">vertical</property>
-        <property name="margin">10</property>
-        <child>
-          <object class="GtkModelButton">
-            <property name="visible">True</property>
-            <property name="action-name">top.action6</property>
-            <property name="text">Item 6d</property>
+            <property name="orientation">horizontal</property>
+            <property name="valign">center</property>
+            <property name="margin-start">12</property>
+            <property name="margin-end">12</property>
+            <property name="margin-top">6</property>
+            <property name="spacing">6</property>
+            <property name="margin-bottom">3</property>
+              <child>
+                <object class="GtkImage">
+                  <property name="visible">True</property>
+                   <property name="valign">center</property>
+                  <property name="icon-size">1</property>
+                  <property name="icon-name">document-open-recent</property>
+                </object>
+              </child>
+              <child>
+                 <object class="GtkModelButton">
+                   <property name="visible">True</property>
+                   <property name="valign">center</property>
+                   <property name="action-name">win.menu-admin-recent-doc</property>
+                   <property name="text" translatable="yes">Recent Documents</property>
+                 </object>
+              </child>
           </object>
         </child>
+        <child>
+          <object class="GtkSeparator">
+            <property name="visible">True</property>
+            <property name="orientation">horizontal</property>
+            <property name="margin-start">12</property>
+            <property name="margin-end">12</property>
+            <property name="margin-top">3</property>
+            <property name="margin-bottom">3</property>
+          </object>
+        </child>
+
       </object>
-      <packing>
-        <property name="submenu">submenu1</property>
-      </packing>
     </child>
 	 
   </object>

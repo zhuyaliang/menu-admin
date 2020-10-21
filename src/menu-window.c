@@ -72,9 +72,17 @@ menu_admin_about (GSimpleAction *action,
 
 }
 
+static void
+menu_admin_recent_doc (GSimpleAction *action,
+                  GVariant      *parameter,
+                  gpointer       user_data)
+{
+
+}
 static const GActionEntry actions[] = {
   { "menu-admin-about", menu_admin_about},
-  { "menu-admin-settings", menu_admin_settings}
+  { "menu-admin-settings", menu_admin_settings},
+  { "menu-admin-recent-doc", menu_admin_recent_doc}
 };
 
 static GtkWidget *create_menu_button (MenuWindow *menuwin)
