@@ -433,7 +433,7 @@ menu_window_init (MenuWindow *menuwin)
     gtk_window_set_decorated (window, FALSE);
     gtk_window_set_resizable (window, FALSE);
     gtk_window_stick (window);
-    //gtk_window_set_icon_name (window, CLOCK_ICON);
+    gtk_window_set_keep_above (window,TRUE);
     gtk_window_set_default_size (GTK_WINDOW (window),
                                  200, 200);
 }
@@ -444,8 +444,8 @@ menu_window_new (void)
     MenuWindow *menuwin;
 
     menuwin = g_object_new (MENU_TYPE_WINDOW,
-                   "type", GTK_WINDOW_TOPLEVEL,
-                   NULL);
+                           "type", GTK_WINDOW_TOPLEVEL,
+                            NULL);
 
     return GTK_WIDGET (menuwin);
 }
