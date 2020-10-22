@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: menu-admin\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-10-21 13:36+0800\n"
+"POT-Creation-Date: 2020-10-22 15:57+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,24 +17,33 @@ msgstr ""
 "Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: src/app-menu.c:241
+#: src/app-menu.c:240
 msgid "Add this launcher to _panel"
 msgstr ""
 
-#: src/app-menu.c:245
+#: src/app-menu.c:244
 msgid "Add this launcher to _desktop"
 msgstr ""
 
-#: src/app-menu.c:252
+#: src/app-menu.c:251
 msgid "_Entire menu"
 msgstr ""
 
-#: src/app-menu.c:257
+#: src/app-menu.c:256
 msgid "Add this as _drawer to panel"
 msgstr ""
 
-#: src/app-menu.c:261
+#: src/app-menu.c:260
 msgid "Add this as _menu to panel"
+msgstr ""
+
+#: src/app-util.c:258
+#, c-format
+msgid "Could not open location '%s'"
+msgstr ""
+
+#: src/app-util.c:288
+msgid "No application to handle search folders is installed."
 msgstr ""
 
 #: src/menu-window.c:65
@@ -45,26 +54,64 @@ msgstr ""
 msgid "applications menu admin"
 msgstr ""
 
+#: src/menu-window.c:108 src/menu-window.c:118
+#, c-format
+msgid "Could not open recently used document \"%s\""
+msgstr ""
+
+#: src/menu-window.c:120
+#, c-format
+msgid "An unknown error occurred while trying to open \"%s\"."
+msgstr ""
+
+#: src/menu-window.c:155 src/resources/menu-admin-function-manager.ui:146
+msgid "Recent Open"
+msgstr ""
+
+#: src/menu-window.c:157
+msgid "Close"
+msgstr ""
+
+#: src/menu-window.c:158
+msgid "Open"
+msgstr ""
+
+#: src/menu-window.c:167
+msgid "All Files"
+msgstr ""
+
+#: src/menu-window.c:168
+msgid "PDF Files"
+msgstr ""
+
+#: src/menu-window.c:169
+msgid "Image Files"
+msgstr ""
+
 #: src/menu-window.c:170
+msgid "Text Files"
+msgstr ""
+
+#: src/menu-window.c:270
 msgid "Search for applications in the menu"
 msgstr ""
 
-#: src/menu-window.c:175
+#: src/menu-window.c:275
 msgid "Click to see more features"
 msgstr ""
 
-#: src/menu-window.c:179
+#: src/menu-window.c:279
 msgid "View current user information"
 msgstr ""
 
-#: src/resources/menu-admin-function-manager.ui:33
+#: src/resources/menu-admin-function-manager.ui:32
 msgid "About"
 msgstr ""
 
-#: src/resources/menu-admin-function-manager.ui:73
+#: src/resources/menu-admin-function-manager.ui:70
 msgid "Settings"
 msgstr ""
 
-#: src/resources/menu-admin-function-manager.ui:113
+#: src/resources/menu-admin-function-manager.ui:108
 msgid "Time"
 msgstr ""

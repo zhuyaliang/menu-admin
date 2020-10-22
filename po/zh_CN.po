@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: menu-admin\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-10-21 13:36+0800\n"
-"PO-Revision-Date: 2020-10-21 13:36+0800\n"
+"POT-Creation-Date: 2020-10-22 15:57+0800\n"
+"PO-Revision-Date: 2020-10-22 16:01+0800\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: none\n"
 "Language: zh_CN\n"
@@ -18,25 +18,34 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: Poedit 2.4.1\n"
 
-#: src/app-menu.c:241
+#: src/app-menu.c:240
 msgid "Add this launcher to _panel"
 msgstr "将此启动器添加到面板"
 
-#: src/app-menu.c:245
+#: src/app-menu.c:244
 msgid "Add this launcher to _desktop"
 msgstr "将此启动器添加到桌面"
 
-#: src/app-menu.c:252
+#: src/app-menu.c:251
 msgid "_Entire menu"
-msgstr ""
+msgstr "整个菜单"
 
-#: src/app-menu.c:257
+#: src/app-menu.c:256
 msgid "Add this as _drawer to panel"
 msgstr "将此作为抽屉添加到面板"
 
-#: src/app-menu.c:261
+#: src/app-menu.c:260
 msgid "Add this as _menu to panel"
 msgstr "将此作为菜单添加到面板"
+
+#: src/app-util.c:258
+#, c-format
+msgid "Could not open location '%s'"
+msgstr "无法打开位置 '%s'"
+
+#: src/app-util.c:288
+msgid "No application to handle search folders is installed."
+msgstr "未安装处理搜索文件夹的应用程序"
 
 #: src/menu-window.c:65
 msgid "translator-credits"
@@ -46,26 +55,64 @@ msgstr "翻译"
 msgid "applications menu admin"
 msgstr "应用程序菜单管理"
 
+#: src/menu-window.c:108 src/menu-window.c:118
+#, c-format
+msgid "Could not open recently used document \"%s\""
+msgstr "无法打开最近使用的文档 \"%s\""
+
+#: src/menu-window.c:120
+#, c-format
+msgid "An unknown error occurred while trying to open \"%s\"."
+msgstr "尝试打开时发生未知错误\"%s\""
+
+#: src/menu-window.c:155 src/resources/menu-admin-function-manager.ui:146
+msgid "Recent Open"
+msgstr "最近打开"
+
+#: src/menu-window.c:157
+msgid "Close"
+msgstr "关闭"
+
+#: src/menu-window.c:158
+msgid "Open"
+msgstr "打开"
+
+#: src/menu-window.c:167
+msgid "All Files"
+msgstr "所有文件"
+
+#: src/menu-window.c:168
+msgid "PDF Files"
+msgstr "pdf 文件"
+
+#: src/menu-window.c:169
+msgid "Image Files"
+msgstr "图像文件"
+
 #: src/menu-window.c:170
+msgid "Text Files"
+msgstr "文本文件"
+
+#: src/menu-window.c:270
 msgid "Search for applications in the menu"
 msgstr "搜索菜单中的应用程序"
 
-#: src/menu-window.c:175
+#: src/menu-window.c:275
 msgid "Click to see more features"
 msgstr "点击查看更多功能"
 
-#: src/menu-window.c:179
+#: src/menu-window.c:279
 msgid "View current user information"
 msgstr "查看当前用户信息"
 
-#: src/resources/menu-admin-function-manager.ui:33
+#: src/resources/menu-admin-function-manager.ui:32
 msgid "About"
 msgstr "关于"
 
-#: src/resources/menu-admin-function-manager.ui:73
+#: src/resources/menu-admin-function-manager.ui:70
 msgid "Settings"
 msgstr "设置"
 
-#: src/resources/menu-admin-function-manager.ui:113
+#: src/resources/menu-admin-function-manager.ui:108
 msgid "Time"
 msgstr "时间"

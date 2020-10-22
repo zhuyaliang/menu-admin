@@ -77,15 +77,14 @@ static void set_recent_filter_chooser (GtkWidget *dialog,const char *name,const 
     GtkRecentFilter  *filter;
     filter = gtk_recent_filter_new ();
     gtk_recent_filter_set_name (filter, name);
-    if (g_strcmp0 (name,"All Files") == 0)
+    if (g_strcmp0 (type,"*") == 0)
         gtk_recent_filter_add_pattern (filter, type);
     else
         gtk_recent_filter_add_mime_type (filter, type);
     gtk_recent_chooser_add_filter (GTK_RECENT_CHOOSER (dialog), filter);
 }
 static void
-recent_open_activate_cb (GtkRecentChooser *chooser,
-                         gpointer          data)
+open_select_recent_file (GtkRecentChooser *chooser)
 {
     GtkRecentInfo *recent_info;
     const char    *uri;
@@ -132,7 +131,19 @@ recent_open_activate_cb (GtkRecentChooser *chooser,
 
     gtk_recent_info_unref (recent_info);
 }
-
+static void
+recent_open_response_cb (GtkDialog *dialog,
+                         gint       response_id)
+{
+    if (response_id == GTK_RESPONSE_OK)
+    {
+        open_select_recent_file (GTK_RECENT_CHOOSER (dialog));
+    }
+    else if (response_id == GTK_RESPONSE_CANCEL)
+    {
+        gtk_widget_destroy (GTK_WIDGET (dialog));
+    }
+}
 static void
 menu_admin_recent_open (GSimpleAction *action,
                         GVariant      *parameter,
@@ -143,20 +154,16 @@ menu_admin_recent_open (GSimpleAction *action,
 
     dialog = gtk_recent_chooser_dialog_new (_("Recent Open"),
                                             parent,
-                                            _("Close"),GTK_RESPONSE_CLOSE,
-                                            _("Clear"),GTK_RESPONSE_CANCEL,
+                                            _("Close"),GTK_RESPONSE_CANCEL,
+                                            _("Open"),GTK_RESPONSE_OK,
                                             NULL);
-    gtk_dialog_set_default_response (GTK_DIALOG (dialog), GTK_RESPONSE_CLOSE);
-    g_signal_connect (dialog,
-                     "item-activated",
-                      G_CALLBACK (recent_open_activate_cb),
-                      NULL);
-/*
+    gtk_dialog_set_default_response (GTK_DIALOG (dialog), GTK_RESPONSE_OK);
+
     g_signal_connect (dialog,
                      "response",
-                      G_CALLBACK (response_cb),
+                      G_CALLBACK (recent_open_response_cb),
                       NULL);
-*/
+
     set_recent_filter_chooser (dialog,_("All Files"),"*");
     set_recent_filter_chooser (dialog,_("PDF Files"),"application/pdf");
     set_recent_filter_chooser (dialog,_("Image Files"),"image/*");
