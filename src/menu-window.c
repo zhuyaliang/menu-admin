@@ -72,17 +72,102 @@ menu_admin_about (GSimpleAction *action,
 
 }
 
-static void
-menu_admin_recent_doc (GSimpleAction *action,
-                  GVariant      *parameter,
-                  gpointer       user_data)
+static void set_recent_filter_chooser (GtkWidget *dialog,const char *name,const char *type)
 {
+    GtkRecentFilter  *filter;
+    filter = gtk_recent_filter_new ();
+    gtk_recent_filter_set_name (filter, name);
+    if (g_strcmp0 (name,"All Files") == 0)
+        gtk_recent_filter_add_pattern (filter, type);
+    else
+        gtk_recent_filter_add_mime_type (filter, type);
+    gtk_recent_chooser_add_filter (GTK_RECENT_CHOOSER (dialog), filter);
+}
+static void
+recent_open_activate_cb (GtkRecentChooser *chooser,
+                         gpointer          data)
+{
+    GtkRecentInfo *recent_info;
+    const char    *uri;
+    const char    *mime_type;
+    GdkScreen     *screen;
+    GError        *error = NULL;
+    char          *uri_utf8;
+    char          *primary;
+    char          *secondary;
 
+    screen = gtk_widget_get_screen (GTK_WIDGET (chooser));
+    recent_info = gtk_recent_chooser_get_current_item (chooser);
+    uri = gtk_recent_info_get_uri (recent_info);
+    mime_type = gtk_recent_info_get_mime_type (recent_info);
+
+    if (menu_show_uri_force_mime_type (screen, uri, mime_type, gtk_get_current_event_time (), &error) != TRUE)
+    {
+        uri_utf8 = g_filename_to_utf8 (uri, -1, NULL, NULL, NULL);
+        if (error)
+        {
+            primary = g_strdup_printf (_("Could not open recently used document \"%s\""),
+                           uri_utf8);
+            menu_error_dialog (NULL, screen,
+                        "cannot_open_recent_doc", TRUE,
+                        primary, error->message);
+            g_free (primary);
+            g_error_free (error);
+        }
+        else
+        {
+            primary = g_strdup_printf (_("Could not open recently used document \"%s\""),
+                           uri_utf8);
+            secondary = g_strdup_printf (_("An unknown error occurred while trying to open \"%s\"."),
+                             uri_utf8);
+            menu_error_dialog (NULL, screen,
+                        "cannot_open_recent_doc", TRUE,
+                        primary, secondary);
+            g_free (primary);
+            g_free (secondary);
+        }
+
+        g_free (uri_utf8);
+    }
+
+    gtk_recent_info_unref (recent_info);
+}
+
+static void
+menu_admin_recent_open (GSimpleAction *action,
+                        GVariant      *parameter,
+                        gpointer       user_data)
+{
+    GtkWindow *parent = GTK_WINDOW (user_data);
+    GtkWidget *dialog;
+
+    dialog = gtk_recent_chooser_dialog_new (_("Recent Open"),
+                                            parent,
+                                            _("Close"),GTK_RESPONSE_CLOSE,
+                                            _("Clear"),GTK_RESPONSE_CANCEL,
+                                            NULL);
+    gtk_dialog_set_default_response (GTK_DIALOG (dialog), GTK_RESPONSE_CLOSE);
+    g_signal_connect (dialog,
+                     "item-activated",
+                      G_CALLBACK (recent_open_activate_cb),
+                      NULL);
+/*
+    g_signal_connect (dialog,
+                     "response",
+                      G_CALLBACK (response_cb),
+                      NULL);
+*/
+    set_recent_filter_chooser (dialog,_("All Files"),"*");
+    set_recent_filter_chooser (dialog,_("PDF Files"),"application/pdf");
+    set_recent_filter_chooser (dialog,_("Image Files"),"image/*");
+    set_recent_filter_chooser (dialog,_("Text Files"),"text/plain");
+
+    gtk_widget_show_all (dialog);
 }
 static const GActionEntry actions[] = {
   { "menu-admin-about", menu_admin_about},
   { "menu-admin-settings", menu_admin_settings},
-  { "menu-admin-recent-doc", menu_admin_recent_doc}
+  { "menu-admin-recent-open", menu_admin_recent_open}
 };
 
 static GtkWidget *create_menu_button (MenuWindow *menuwin)
@@ -101,7 +186,7 @@ static GtkWidget *create_menu_button (MenuWindow *menuwin)
     g_action_map_add_action_entries (G_ACTION_MAP (action_group),
                                      actions,
                                      G_N_ELEMENTS (actions),
-                                     NULL);
+                                     menuwin);
 
     gtk_widget_insert_action_group (GTK_WIDGET(menuwin), "win", G_ACTION_GROUP (action_group));
     builder = gtk_builder_new_from_resource ("/org/admin/menu/menu-admin-function-manager.ui");

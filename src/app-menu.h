@@ -4,6 +4,11 @@
 #include <gtk/gtk.h>
 #include <libintl.h>
 #include <locale.h>
+#include <string.h>
+#include <glib/gi18n.h>
+#include <gio/gio.h>
+
+
 #pragma once
 #define APP_TYPE_MENU (app_menu_get_type ())        
 G_DECLARE_FINAL_TYPE (AppMenu, app_menu, APP, MENU, GObject)

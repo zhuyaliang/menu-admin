@@ -142,8 +142,8 @@
                  <object class="GtkModelButton">
                    <property name="visible">True</property>
                    <property name="valign">center</property>
-                   <property name="action-name">win.menu-admin-recent-doc</property>
-                   <property name="text" translatable="yes">Recent Documents</property>
+                   <property name="action-name">win.menu-admin-recent-open</property>
+                   <property name="text" translatable="yes">Recent Open</property>
                  </object>
               </child>
           </object>

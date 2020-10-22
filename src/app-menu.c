@@ -9,7 +9,6 @@
 #define  MENU_ICON_SIZE                    "icon-size"
 #define  MENU_FONT_SIZE                    "font-size"
 
-#define _(STRING)  gettext(STRING)
 struct _AppMenu
 {
     GObject       parent;
@@ -542,13 +541,13 @@ submenu_to_display_in_idle (gpointer data)
 
     return FALSE;
 }
- static void
- remove_submenu_to_display_idle (gpointer data)
- {
-     guint idle_id = GPOINTER_TO_UINT (data);
+static void
+remove_submenu_to_display_idle (gpointer data)
+{
+    guint idle_id = GPOINTER_TO_UINT (data);
  
-     g_source_remove (idle_id);
- }
+    g_source_remove (idle_id);
+}
 static void view_submenu(GtkWidget *widget,  gpointer data)
 {
     AppMenu      *menu = APP_MENU(data);
@@ -630,159 +629,6 @@ app_g_lookup_in_applications_dirs (const char *basename)
     return _app_g_lookup_in_data_dirs_internal (basename,
                               _lookup_in_applications_subdir);
 }
-static GtkWidget *
-panel_error_dialog (GtkWindow  *parent,
-            GdkScreen  *screen,
-            const char *dialog_class,
-            gboolean    auto_destroy,
-            const char *primary_text,
-            const char *secondary_text)
-{
-    GtkWidget *dialog;
-    char      *freeme;
-
-    freeme = NULL;
-
-    if (primary_text == NULL) {
-        g_warning ("NULL dialog");
-         /* No need to translate this, this should NEVER happen */
-        freeme = g_strdup_printf ("Error with displaying error "
-                      "for dialog of class %s",
-                      dialog_class);
-        primary_text = freeme;
-    }
-
-    dialog = gtk_message_dialog_new (parent, 0, GTK_MESSAGE_ERROR,
-                     GTK_BUTTONS_CLOSE, "%s", primary_text);
-    if (secondary_text != NULL)
-        gtk_message_dialog_format_secondary_text (GTK_MESSAGE_DIALOG (dialog),
-                              "%s", secondary_text);
-
-    if (screen)
-        gtk_window_set_screen (GTK_WINDOW (dialog), screen);
-
-    if (!parent) {
-        gtk_window_set_skip_taskbar_hint (GTK_WINDOW (dialog), FALSE);
-        /* FIXME: We need a title in this case, but we don't know what
-         * the format should be. Let's put something simple until
-         * the following bug gets fixed:
-         * http://bugzilla.gnome.org/show_bug.cgi?id=165132 */
-        gtk_window_set_title (GTK_WINDOW (dialog), "Error");
-    }
-
-    gtk_widget_show_all (dialog);
-
-    if (auto_destroy)
-        g_signal_connect_swapped (G_OBJECT (dialog), "response",
-                      G_CALLBACK (gtk_widget_destroy),
-                      G_OBJECT (dialog));
-
-    if (freeme)
-        g_free (freeme);
-
-    return dialog;
-}
-static void
-_app_launch_error_dialog (const gchar *name,
-                GdkScreen   *screen,
-                const gchar *message)
-{
-    char *primary;
-
-    if (name)
-        primary = g_markup_printf_escaped ("Could not launch '%s'",
-                           name);
-    else
-        primary = g_strdup ("Could not launch application");
-
-    panel_error_dialog (NULL, screen, "cannot_launch", TRUE,
-                primary, message);
-    g_free (primary);
-}
-
-static gboolean
-_app_launch_handle_error (const gchar  *name,
-                GdkScreen    *screen,
-                GError       *local_error,
-                GError      **error)
-{
-    if (g_error_matches (local_error,
-                 G_IO_ERROR, G_IO_ERROR_CANCELLED)) {
-        g_error_free (local_error);
-        return TRUE;
-    }
-
-    else if (error != NULL)
-        g_propagate_error (error, local_error);
-
-    else {
-        _app_launch_error_dialog (name, screen, local_error->message);
-        g_error_free (local_error);
-    }
-
-    return FALSE;
-}
-static void
-dummy_child_watch (GPid     pid,
-           gint     status,
-           gpointer user_data)
-{   
-    /* Nothing, this is just to ensure we don't double fork
-     * and break pkexec:
-     * https://bugzilla.gnome.org/show_bug.cgi?id=675789
-     */
-}
-
-static void
-gather_pid_callback (GDesktopAppInfo   *gapp,
-             GPid               pid,
-             gpointer           data)
-{
-    g_child_watch_add (pid, dummy_child_watch, NULL);
-}
-
-static gboolean
-app_app_info_launch_uris (GDesktopAppInfo   *appinfo,
-                GList      *uris,
-                GdkScreen  *screen,
-                const gchar *action,
-                guint32     timestamp,
-                GError    **error)
-{
-    GdkAppLaunchContext *context;
-    GError              *local_error;
-    gboolean             retval;
-    GdkDisplay          *display;
-
-    g_return_val_if_fail (G_IS_DESKTOP_APP_INFO (appinfo), FALSE);
-    g_return_val_if_fail (GDK_IS_SCREEN (screen), FALSE);
-    g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
-
-    display = gdk_display_get_default ();
-    context = gdk_display_get_app_launch_context (display);
-    gdk_app_launch_context_set_screen (context, screen);
-    gdk_app_launch_context_set_timestamp (context, timestamp);
-
-    local_error = NULL;
-    if (action == NULL) {
-        retval = g_desktop_app_info_launch_uris_as_manager (appinfo, uris,
-                           G_APP_LAUNCH_CONTEXT (context),
-                           G_SPAWN_SEARCH_PATH | G_SPAWN_DO_NOT_REAP_CHILD,
-                           NULL, NULL, gather_pid_callback, appinfo,
-                           &local_error);
-    } else {
-        g_desktop_app_info_launch_action (appinfo, action, G_APP_LAUNCH_CONTEXT (context));
-        retval = TRUE;
-    }
-
-    g_object_unref (context);
-
-    if ((local_error == NULL) && (retval == TRUE))
-        return TRUE;
-
-    return _app_launch_handle_error (g_app_info_get_name (G_APP_INFO(appinfo)),
-                       screen, local_error, error);
-}
 
 static gboolean
 app_launch_desktop_file (const char  *desktop_file,
@@ -813,7 +659,7 @@ app_launch_desktop_file (const char  *desktop_file,
     if (appinfo == NULL)
         return FALSE;
 
-    retval = app_app_info_launch_uris (appinfo, NULL, screen, NULL,
+    retval = menu_app_info_launch_uris (appinfo, NULL, screen, NULL,
                          gtk_get_current_event_time (),
                          error);
 
