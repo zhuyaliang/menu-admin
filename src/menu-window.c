@@ -157,6 +157,7 @@ menu_admin_recent_open (GSimpleAction *action,
                                             _("Close"),GTK_RESPONSE_CANCEL,
                                             _("Open"),GTK_RESPONSE_OK,
                                             NULL);
+    gtk_window_set_position (GTK_WINDOW (dialog), GTK_WIN_POS_CENTER);
     gtk_dialog_set_default_response (GTK_DIALOG (dialog), GTK_RESPONSE_OK);
 
     g_signal_connect (dialog,
