@@ -166,7 +166,7 @@ menu_admin_about (GSimpleAction *action,
     GtkWindow *parent = GTK_WINDOW (user_data);
 
     static const gchar* artists[] = {
-         "zhuyaliang <15132211195@163.com>",
+         "tina <15132211195@163.com>",
          NULL
      };
     static const gchar* authors[] = {
