@@ -34,12 +34,106 @@ static void set_box_background (GtkWidget *box)
     g_object_unref (provider);
     g_free (css);
 }
+
+static gboolean
+font_size_mapping_get (GValue   *value,
+                       GVariant *variant,
+                       gpointer  user_data)
+{
+    const char *font_style;
+
+    font_style = g_variant_get_string (variant,NULL);
+    g_value_set_string (value, font_style);
+
+    return TRUE;
+}
+static GVariant *
+font_size_mapping_set (const GValue       *value,
+                       const GVariantType *expected_type,
+                       gpointer            user_data)
+{
+    return g_variant_new_string (g_value_get_string (value));
+}
+
+static GtkWidget *create_style_combox (const char **style,
+                                       GSettings   *settings,
+                                       const char  *key)
+{
+    GtkWidget *combox;
+    int i = 0;
+
+    combox = gtk_combo_box_text_new ();
+    while (style[i] != NULL)
+    {
+        gtk_combo_box_text_append (GTK_COMBO_BOX_TEXT (combox), style[i], style[i]);
+        i++;
+    }
+
+    g_settings_bind_with_mapping (settings,
+                                  key,
+                                  combox,
+                                 "active-id",
+                                  G_SETTINGS_BIND_DEFAULT,
+                                  font_size_mapping_get,
+                                  font_size_mapping_set,
+                                  NULL, NULL);
+    return combox;
+}
 static void
 menu_admin_settings (GSimpleAction *action,
                   GVariant      *parameter,
                   gpointer       user_data)
 {
-  g_print ("Text set from normal menu item\r\n");
+    GtkWindow  *parent = GTK_WINDOW (user_data);
+    MenuWindow *menuwin = MENU_WINDOW (user_data);
+    GtkWidget  *dialog;
+    GtkWidget  *box;
+    GtkWidget  *dialog_area;
+    GtkWidget  *table;
+    GtkWidget  *combox;
+    GtkWidget  *label;
+
+    const char *font_style [] = {"xx-small","x-small","small","medium","large","x-large","xx-large",NULL};
+    const char *icon_style [] = {"16px","24px","32px","48px",NULL};
+    GtkDialogFlags flags = GTK_DIALOG_MODAL | GTK_DIALOG_DESTROY_WITH_PARENT;
+
+    dialog = gtk_dialog_new_with_buttons (_("Setting Menu"),
+                                          parent,
+                                          flags,
+                                          _("Confirm"),
+                                          GTK_RESPONSE_OK,
+                                          _("_Close"),
+                                          GTK_RESPONSE_CLOSE,
+                                          NULL);
+
+    gtk_window_set_deletable (GTK_WINDOW (dialog), FALSE);
+    gtk_window_set_default_size (GTK_WINDOW (dialog), 300, 200);
+    gtk_window_set_resizable (GTK_WINDOW (dialog), FALSE);
+    dialog_area = gtk_dialog_get_content_area (GTK_DIALOG (dialog));
+    box =  gtk_box_new(GTK_ORIENTATION_VERTICAL, 12);
+    gtk_box_pack_start (GTK_BOX (dialog_area), box, TRUE, TRUE, 12);
+
+    table = gtk_grid_new();
+    gtk_grid_set_row_spacing(GTK_GRID(table), 10);
+    gtk_grid_set_column_spacing(GTK_GRID(table), 10);
+    gtk_box_pack_start(GTK_BOX(box), table, TRUE, TRUE, 0);
+    gtk_grid_set_column_homogeneous(GTK_GRID(table), TRUE);
+
+    label = gtk_label_new(_("Menu Font"));
+    gtk_grid_attach(GTK_GRID(table), label, 0, 0, 1, 1);
+    combox = create_style_combox (font_style,
+                                  menuwin->priv->settings,
+                                  MENU_FONT_SIZE);
+    gtk_grid_attach(GTK_GRID(table), combox, 1, 0, 2, 1);
+
+    label = gtk_label_new(_("Menu Icon"));
+    gtk_grid_attach(GTK_GRID(table), label, 0, 1, 1, 1);
+    combox = create_style_combox (icon_style,
+                                  menuwin->priv->settings,
+                                  MENU_ICON_SIZE);
+    gtk_grid_attach(GTK_GRID(table), combox, 1, 1, 2, 1);
+
+    gtk_widget_show_all (dialog);
 }
 
 static void
@@ -426,6 +520,7 @@ menu_window_init (MenuWindow *menuwin)
     GtkWindow *window;
 
     menuwin->priv = menu_window_get_instance_private (menuwin);
+    menuwin->priv->settings = g_settings_new (MENU_ADMID_SCHEMA);
 
     window = GTK_WINDOW (menuwin);
     gtk_window_set_type_hint (window, GDK_WINDOW_TYPE_HINT_MENU);

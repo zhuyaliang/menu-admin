@@ -5,6 +5,12 @@
 #include <gio/gio.h>
 #include <gio/gdesktopappinfo.h>
 
+#define  MENU_ADMID_SCHEMA                 "org.admin.menu"
+#define  MENU_DEFAULT_ITEM                 "default-item"
+#define  MENU_ICON_SIZE                    "icon-size"
+#define  MENU_FONT_SIZE                    "font-size"
+
+
 typedef GDesktopAppInfo GDAInfo;
 GIcon     *app_gicon_from_icon_name         (const gchar *icon_name);
 

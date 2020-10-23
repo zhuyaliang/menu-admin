@@ -3,12 +3,6 @@
 #include "app-menu.h"
 #include "app-util.h"
  
-
-#define  MENU_ADMID_SCHEMA                 "org.admin.menu"
-#define  MENU_DEFAULT_ITEM                 "default-item"
-#define  MENU_ICON_SIZE                    "icon-size"
-#define  MENU_FONT_SIZE                    "font-size"
-
 struct _AppMenu
 {
     GObject       parent;
