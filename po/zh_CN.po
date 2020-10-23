@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: menu-admin\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-10-22 15:57+0800\n"
-"PO-Revision-Date: 2020-10-22 16:01+0800\n"
+"POT-Creation-Date: 2020-10-23 16:55+0800\n"
+"PO-Revision-Date: 2020-10-23 16:56+0800\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: none\n"
 "Language: zh_CN\n"
@@ -18,23 +18,23 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: Poedit 2.4.1\n"
 
-#: src/app-menu.c:240
+#: src/app-menu.c:234
 msgid "Add this launcher to _panel"
 msgstr "将此启动器添加到面板"
 
-#: src/app-menu.c:244
+#: src/app-menu.c:238
 msgid "Add this launcher to _desktop"
 msgstr "将此启动器添加到桌面"
 
-#: src/app-menu.c:251
+#: src/app-menu.c:245
 msgid "_Entire menu"
 msgstr "整个菜单"
 
-#: src/app-menu.c:256
+#: src/app-menu.c:250
 msgid "Add this as _drawer to panel"
 msgstr "将此作为抽屉添加到面板"
 
-#: src/app-menu.c:260
+#: src/app-menu.c:254
 msgid "Add this as _menu to panel"
 msgstr "将此作为菜单添加到面板"
 
@@ -45,63 +45,83 @@ msgstr "无法打开位置 '%s'"
 
 #: src/app-util.c:288
 msgid "No application to handle search folders is installed."
-msgstr "未安装处理搜索文件夹的应用程序"
+msgstr "未安装处理搜索文件夹的应用程序."
 
-#: src/menu-window.c:65
+#: src/menu-window.c:100
+msgid "Setting Menu"
+msgstr "设置菜单"
+
+#: src/menu-window.c:103
+msgid "Confirm"
+msgstr "确认"
+
+#: src/menu-window.c:105
+msgid "Restore"
+msgstr "还原"
+
+#: src/menu-window.c:122
+msgid "Menu Font"
+msgstr "菜单字体"
+
+#: src/menu-window.c:129
+msgid "Menu Icon"
+msgstr "菜单图标"
+
+#: src/menu-window.c:159
 msgid "translator-credits"
 msgstr "翻译"
 
-#: src/menu-window.c:66
+#: src/menu-window.c:160
 msgid "applications menu admin"
 msgstr "应用程序菜单管理"
 
-#: src/menu-window.c:108 src/menu-window.c:118
+#: src/menu-window.c:202 src/menu-window.c:212
 #, c-format
 msgid "Could not open recently used document \"%s\""
 msgstr "无法打开最近使用的文档 \"%s\""
 
-#: src/menu-window.c:120
+#: src/menu-window.c:214
 #, c-format
 msgid "An unknown error occurred while trying to open \"%s\"."
-msgstr "尝试打开时发生未知错误\"%s\""
+msgstr "尝试打开时发生未知错误\"%s\"."
 
-#: src/menu-window.c:155 src/resources/menu-admin-function-manager.ui:146
+#: src/menu-window.c:249 src/resources/menu-admin-function-manager.ui:146
 msgid "Recent Open"
 msgstr "最近打开"
 
-#: src/menu-window.c:157
+#: src/menu-window.c:251
 msgid "Close"
 msgstr "关闭"
 
-#: src/menu-window.c:158
+#: src/menu-window.c:252
 msgid "Open"
 msgstr "打开"
 
-#: src/menu-window.c:167
+#: src/menu-window.c:262
 msgid "All Files"
 msgstr "所有文件"
 
-#: src/menu-window.c:168
+#: src/menu-window.c:263
 msgid "PDF Files"
-msgstr "pdf 文件"
+msgstr "pdf 文件."
 
-#: src/menu-window.c:169
+#: src/menu-window.c:264
 msgid "Image Files"
 msgstr "图像文件"
 
-#: src/menu-window.c:170
+#: src/menu-window.c:265
 msgid "Text Files"
 msgstr "文本文件"
 
-#: src/menu-window.c:270
+#: src/menu-window.c:365
 msgid "Search for applications in the menu"
 msgstr "搜索菜单中的应用程序"
 
-#: src/menu-window.c:275
+#: src/menu-window.c:370
 msgid "Click to see more features"
 msgstr "点击查看更多功能"
 
-#: src/menu-window.c:279
+#: src/menu-window.c:374
 msgid "View current user information"
 msgstr "查看当前用户信息"
 

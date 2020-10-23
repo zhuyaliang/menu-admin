@@ -102,7 +102,7 @@ menu_admin_settings (GSimpleAction *action,
                                           flags,
                                           _("Confirm"),
                                           GTK_RESPONSE_OK,
-                                          _("_Close"),
+                                          _("Restore"),
                                           GTK_RESPONSE_CLOSE,
                                           NULL);
 
