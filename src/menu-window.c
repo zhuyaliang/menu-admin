@@ -80,6 +80,23 @@ static GtkWidget *create_style_combox (const char **style,
     return combox;
 }
 static void
+menu_settings_response_cb (GtkDialog *dialog,
+                           gint       response_id,
+                           gpointer   user_data)
+{
+    GSettings *settings = G_SETTINGS (user_data);
+
+    if (response_id == GTK_RESPONSE_OK)
+    {
+        g_settings_reset (settings,MENU_ICON_SIZE);
+        g_settings_reset (settings,MENU_FONT_SIZE);
+    }
+    else if (response_id == GTK_RESPONSE_CLOSE)
+    {
+        gtk_widget_destroy (GTK_WIDGET (dialog));
+    }
+}
+static void
 menu_admin_settings (GSimpleAction *action,
                   GVariant      *parameter,
                   gpointer       user_data)
@@ -100,11 +117,15 @@ menu_admin_settings (GSimpleAction *action,
     dialog = gtk_dialog_new_with_buttons (_("Setting Menu"),
                                           parent,
                                           flags,
-                                          _("Confirm"),
-                                          GTK_RESPONSE_OK,
                                           _("Restore"),
+                                          GTK_RESPONSE_OK,
+                                          _("Close"),
                                           GTK_RESPONSE_CLOSE,
                                           NULL);
+    g_signal_connect (dialog,
+                     "response",
+                      G_CALLBACK (menu_settings_response_cb),
+                      menuwin->priv->settings);
 
     gtk_window_set_deletable (GTK_WINDOW (dialog), FALSE);
     gtk_window_set_default_size (GTK_WINDOW (dialog), 300, 200);
