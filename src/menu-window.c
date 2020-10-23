@@ -287,9 +287,26 @@ menu_admin_recent_open (GSimpleAction *action,
 
     gtk_widget_show_all (dialog);
 }
+static void
+menu_admin_computer (GSimpleAction *action,
+                     GVariant      *parameter,
+                     gpointer       user_data)
+{
+
+}
+
+static void
+menu_admin_network (GSimpleAction *action,
+                    GVariant      *parameter,
+                    gpointer       user_data)
+{
+
+}
 static const GActionEntry actions[] = {
   { "menu-admin-about", menu_admin_about},
   { "menu-admin-settings", menu_admin_settings},
+  { "menu-admin-computer", menu_admin_computer},
+  { "menu-admin-network", menu_admin_network},
   { "menu-admin-recent-open", menu_admin_recent_open}
 };
 
