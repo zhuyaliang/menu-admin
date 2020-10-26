@@ -297,3 +297,82 @@ menu_show_uri_force_mime_type (GdkScreen    *screen,
 
     return ret;
 }
+typedef char * (*LookupInDir) (const char *basename, const char *dir);
+static char *
+lookup_in_applications_subdir (const char *basename,
+                               const char *dir)
+{
+    char *path;
+
+    path = g_build_filename (dir, "applications", basename, NULL);
+    if (!g_file_test (path, G_FILE_TEST_EXISTS))
+    {
+        g_free (path);
+        return NULL;
+    }
+
+    return path;
+}
+
+static char *
+menu_lookup_in_data_dirs_internal (const char *basename,
+                                   LookupInDir lookup)
+{
+    const char * const *system_data_dirs;
+    const char          *user_data_dir;
+    char                *retval;
+    int                  i;
+
+    user_data_dir    = g_get_user_data_dir ();
+    system_data_dirs = g_get_system_data_dirs ();
+
+    if ((retval = lookup (basename, user_data_dir)))
+        return retval;
+
+    for (i = 0; system_data_dirs[i]; i++)
+        if ((retval = lookup (basename, system_data_dirs[i])))
+            return retval;
+
+    return NULL;
+}
+
+
+static char *
+menu_lookup_in_applications_dirs (const char *basename)
+{
+    return menu_lookup_in_data_dirs_internal (basename,lookup_in_applications_subdir);
+}
+
+
+gboolean
+menu_show_fm_search_uri (const gchar  *fm,
+                         GdkScreen    *screen,
+                         const gchar  *uri,
+                         guint32       timestamp,
+                         GError      **error)
+{
+    char            *desktopfile;
+    GDesktopAppInfo *appinfo = NULL;
+    gboolean         ret;
+    GList           *uris = NULL;
+
+    desktopfile = menu_lookup_in_applications_dirs (fm);
+    if (desktopfile)
+    {
+        appinfo = g_desktop_app_info_new_from_filename (desktopfile);
+        g_free (desktopfile);
+    }
+
+    if (!appinfo)
+    {
+        menu_show_error_dialog (uri, screen,
+                                _("No application to handle search folders is installed."));
+        return FALSE;
+    }
+    uris = g_list_prepend (uris, (gpointer) uri);
+    ret = menu_app_info_launch_uris (appinfo, uris,
+                                     screen, NULL, timestamp, error);
+    g_object_unref (appinfo);
+    g_list_free (uris);
+    return ret;
+}

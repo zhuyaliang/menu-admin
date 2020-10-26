@@ -38,4 +38,10 @@ GtkWidget *menu_error_dialog                (GtkWindow    *parent,
                                              gboolean      auto_destroy,
                                              const char   *primary_text,
                                              const char   *secondary_text);
+
+gboolean   menu_show_fm_search_uri          (const gchar  *fm,
+                                             GdkScreen    *screen,
+                                             const gchar  *uri,
+                                             guint32       timestamp,
+                                             GError      **error);
 #endif

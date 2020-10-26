@@ -287,12 +287,41 @@ menu_admin_recent_open (GSimpleAction *action,
 
     gtk_widget_show_all (dialog);
 }
+static gboolean menu_admin_fm_open (const char *uri,GtkWidget *window)
+{
+    GdkScreen  *screen;
+    guint32     timestamp;
+    GError     *error = NULL;
+
+    screen = gtk_widget_get_screen (GTK_WIDGET (window));
+    timestamp = gtk_get_current_event_time ();
+
+    if (g_str_has_prefix (uri, "x-nautilus-search:"))
+    {
+        return menu_show_fm_search_uri ("nautilus-folder-handler.desktop",
+                                         screen,
+                                         uri,
+                                         timestamp,
+                                        &error);
+    }
+    if (g_str_has_prefix(uri, "x-caja-search:"))
+    {
+        return menu_show_fm_search_uri ("caja-folder-handler.desktop",
+                                         screen,
+                                         uri,
+                                         timestamp,
+                                        &error);
+    }
+    gtk_show_uri_on_window (NULL, uri,timestamp, &error);
+
+    return TRUE;
+}
 static void
 menu_admin_computer (GSimpleAction *action,
                      GVariant      *parameter,
                      gpointer       user_data)
 {
-
+    menu_admin_fm_open ("computer://",GTK_WIDGET (user_data));
 }
 
 static void
@@ -300,7 +329,7 @@ menu_admin_network (GSimpleAction *action,
                     GVariant      *parameter,
                     gpointer       user_data)
 {
-
+    menu_admin_fm_open ("network://",GTK_WIDGET (user_data));
 }
 static const GActionEntry actions[] = {
   { "menu-admin-about", menu_admin_about},
