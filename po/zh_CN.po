@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: menu-admin\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-10-23 16:55+0800\n"
-"PO-Revision-Date: 2020-10-23 16:56+0800\n"
+"POT-Creation-Date: 2020-10-26 13:32+0800\n"
+"PO-Revision-Date: 2020-10-26 13:33+0800\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: none\n"
 "Language: zh_CN\n"
@@ -43,85 +43,81 @@ msgstr "将此作为菜单添加到面板"
 msgid "Could not open location '%s'"
 msgstr "无法打开位置 '%s'"
 
-#: src/app-util.c:288
+#: src/app-util.c:288 src/app-util.c:369
 msgid "No application to handle search folders is installed."
 msgstr "未安装处理搜索文件夹的应用程序."
 
-#: src/menu-window.c:100
+#: src/menu-window.c:117
 msgid "Setting Menu"
 msgstr "设置菜单"
 
-#: src/menu-window.c:103
-msgid "Confirm"
-msgstr "确认"
-
-#: src/menu-window.c:105
+#: src/menu-window.c:120
 msgid "Restore"
 msgstr "还原"
 
-#: src/menu-window.c:122
+#: src/menu-window.c:122 src/menu-window.c:272
+msgid "Close"
+msgstr "关闭"
+
+#: src/menu-window.c:143
 msgid "Menu Font"
 msgstr "菜单字体"
 
-#: src/menu-window.c:129
+#: src/menu-window.c:150
 msgid "Menu Icon"
 msgstr "菜单图标"
 
-#: src/menu-window.c:159
+#: src/menu-window.c:180
 msgid "translator-credits"
 msgstr "翻译"
 
-#: src/menu-window.c:160
+#: src/menu-window.c:181
 msgid "applications menu admin"
 msgstr "应用程序菜单管理"
 
-#: src/menu-window.c:202 src/menu-window.c:212
+#: src/menu-window.c:223 src/menu-window.c:233
 #, c-format
 msgid "Could not open recently used document \"%s\""
 msgstr "无法打开最近使用的文档 \"%s\""
 
-#: src/menu-window.c:214
+#: src/menu-window.c:235
 #, c-format
 msgid "An unknown error occurred while trying to open \"%s\"."
 msgstr "尝试打开时发生未知错误\"%s\"."
 
-#: src/menu-window.c:249 src/resources/menu-admin-function-manager.ui:146
+#: src/menu-window.c:270 src/resources/menu-admin-function-manager.ui:185
 msgid "Recent Open"
 msgstr "最近打开"
 
-#: src/menu-window.c:251
-msgid "Close"
-msgstr "关闭"
-
-#: src/menu-window.c:252
+#: src/menu-window.c:273
 msgid "Open"
 msgstr "打开"
 
-#: src/menu-window.c:262
+#: src/menu-window.c:283
 msgid "All Files"
 msgstr "所有文件"
 
-#: src/menu-window.c:263
+#: src/menu-window.c:284
 msgid "PDF Files"
 msgstr "pdf 文件."
 
-#: src/menu-window.c:264
+#: src/menu-window.c:285
 msgid "Image Files"
 msgstr "图像文件"
 
-#: src/menu-window.c:265
+#: src/menu-window.c:286
 msgid "Text Files"
 msgstr "文本文件"
 
-#: src/menu-window.c:365
+#: src/menu-window.c:432
 msgid "Search for applications in the menu"
 msgstr "搜索菜单中的应用程序"
 
-#: src/menu-window.c:370
+#: src/menu-window.c:437
 msgid "Click to see more features"
 msgstr "点击查看更多功能"
 
-#: src/menu-window.c:374
+#: src/menu-window.c:441
 msgid "View current user information"
 msgstr "查看当前用户信息"
 
@@ -134,5 +130,15 @@ msgid "Settings"
 msgstr "设置"
 
 #: src/resources/menu-admin-function-manager.ui:108
-msgid "Time"
-msgstr "时间"
+msgid "Network"
+msgstr "网络"
+
+#: src/resources/menu-admin-function-manager.ui:147
+msgid "Computer"
+msgstr "计算机"
+
+#~ msgid "Confirm"
+#~ msgstr "确认"
+
+#~ msgid "Time"
+#~ msgstr "时间"
