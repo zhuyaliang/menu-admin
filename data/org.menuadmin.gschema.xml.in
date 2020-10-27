@@ -36,6 +36,20 @@
         <summary>Menu bar width size</summary>
         <description>Set the width of the menu bar view</description>
         </key>
+        <!--  
+        <key name="row-spacing" type="u">
+        <range min="220" max="320"/>
+        <default>270</default>
+        <summary>Menu bar width size</summary>
+        <description>Set the width of the menu bar view</description>
+        </key>
+        -->
+        <key name="column-spacing" type="u">
+        <range min="1" max="50"/>
+        <default>8</default>
+        <summary>Menu bar column spacing</summary>
+        <description>Set column spacing for menu bar icons and text</description>
+        </key>
 
         <key name="font-size" enum="org.admin.menu.font-size">
         <default>'medium'</default>
