@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: menu-admin\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-10-27 15:13+0800\n"
-"PO-Revision-Date: 2020-10-27 15:15+0800\n"
+"POT-Creation-Date: 2020-10-27 18:22+0800\n"
+"PO-Revision-Date: 2020-10-27 18:25+0800\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: none\n"
 "Language: zh_CN\n"
@@ -35,50 +35,66 @@ msgid "Set the size of an icon used in menu bar"
 msgstr "设置菜单栏中使用的图标的大小"
 
 #: data/org.menuadmin.gschema.xml.in:36
-msgid "Menu width"
-msgstr "菜单宽度"
+msgid "Menu bar width size"
+msgstr "菜单栏宽度大小"
 
 #: data/org.menuadmin.gschema.xml.in:37
 msgid "Set the width of the menu bar view"
 msgstr "设置菜单栏视图宽度"
 
-#: data/org.menuadmin.gschema.xml.in:42
+#: data/org.menuadmin.gschema.xml.in:43
+msgid "Menu bar row spacing"
+msgstr "菜单栏行间距"
+
+#: data/org.menuadmin.gschema.xml.in:44
+msgid "Set row spacing for menu bar icons and text"
+msgstr "设置菜单栏图标和文本的行间距"
+
+#: data/org.menuadmin.gschema.xml.in:50
+msgid "Menu bar column spacing"
+msgstr "菜单栏列间距"
+
+#: data/org.menuadmin.gschema.xml.in:51
+msgid "Set column spacing for menu bar icons and text"
+msgstr "设置菜单栏图标和文本的列间距"
+
+#: data/org.menuadmin.gschema.xml.in:56
 msgid "Menu bar font size"
 msgstr "菜单栏字体大小"
 
-#: data/org.menuadmin.gschema.xml.in:43
+#: data/org.menuadmin.gschema.xml.in:57
 msgid "Set the size of an font used in menu bar"
 msgstr "设置菜单栏中使用的字体大小"
 
-#: src/app-menu.c:262
+#: src/app-menu.c:274
 msgid "add app to desktop"
 msgstr "将应用程序添加到桌面"
 
-#: src/app-menu.c:264
+#: src/app-menu.c:276
 msgid "Problem while copying launcher to desktop"
 msgstr "将启动器复制到桌面时出现问题"
 
-#: src/app-menu.c:286
+#: src/app-menu.c:298
 msgid "Add this launcher to _panel"
 msgstr "将此启动器添加到面板"
 
-#: src/app-menu.c:290
+#: src/app-menu.c:302
 msgid "Add this launcher to _desktop"
 msgstr "将此启动器添加到桌面"
 
-#: src/app-menu.c:299
+#: src/app-menu.c:311
 msgid "Preferences"
 msgstr "属性"
 
-#: src/app-menu.c:310
+#: src/app-menu.c:322
 msgid "_Entire menu"
 msgstr "整个菜单"
 
-#: src/app-menu.c:315
+#: src/app-menu.c:327
 msgid "Add this as _drawer to panel"
 msgstr "将此作为抽屉添加到面板"
 
-#: src/app-menu.c:319
+#: src/app-menu.c:331
 msgid "Add this as _menu to panel"
 msgstr "将此作为菜单添加到面板"
 
@@ -91,77 +107,92 @@ msgstr "无法打开位置 '%s'"
 msgid "No application to handle search folders is installed."
 msgstr "未安装处理搜索文件夹的应用程序."
 
-#: src/menu-window.c:117
+#: src/menu-window.c:161
 msgid "Setting Menu"
 msgstr "设置菜单"
 
-#: src/menu-window.c:120
+#: src/menu-window.c:164
 msgid "Restore"
 msgstr "还原"
 
-#: src/menu-window.c:122 src/menu-window.c:272
+#: src/menu-window.c:166 src/menu-window.c:340
 msgid "Close"
 msgstr "关闭"
 
-#: src/menu-window.c:143
+#: src/menu-window.c:187
 msgid "Menu Font"
 msgstr "菜单字体"
 
-#: src/menu-window.c:150
+#: src/menu-window.c:194
 msgid "Menu Icon"
 msgstr "菜单图标"
 
-#: src/menu-window.c:180
+#. setting menu width
+#: src/menu-window.c:202
+msgid "Menu width"
+msgstr "菜单宽度"
+
+#. settings menu column
+#: src/menu-window.c:210
+msgid "Menu column"
+msgstr "菜单列"
+
+#. settings menu row
+#: src/menu-window.c:218
+msgid "Menu row"
+msgstr "菜单行"
+
+#: src/menu-window.c:248
 msgid "translator-credits"
 msgstr "翻译"
 
-#: src/menu-window.c:181
+#: src/menu-window.c:249
 msgid "applications menu admin"
 msgstr "应用程序菜单管理"
 
-#: src/menu-window.c:223 src/menu-window.c:233
+#: src/menu-window.c:291 src/menu-window.c:301
 #, c-format
 msgid "Could not open recently used document \"%s\""
 msgstr "无法打开最近使用的文档 \"%s\""
 
-#: src/menu-window.c:235
+#: src/menu-window.c:303
 #, c-format
 msgid "An unknown error occurred while trying to open \"%s\"."
 msgstr "尝试打开时发生未知错误\"%s\"."
 
-#: src/menu-window.c:270 src/resources/menu-admin-function-manager.ui:185
+#: src/menu-window.c:338 src/resources/menu-admin-function-manager.ui:185
 msgid "Recent Open"
 msgstr "最近打开"
 
-#: src/menu-window.c:273
+#: src/menu-window.c:341
 msgid "Open"
 msgstr "打开"
 
-#: src/menu-window.c:283
+#: src/menu-window.c:351
 msgid "All Files"
 msgstr "所有文件"
 
-#: src/menu-window.c:284
+#: src/menu-window.c:352
 msgid "PDF Files"
 msgstr "pdf 文件."
 
-#: src/menu-window.c:285
+#: src/menu-window.c:353
 msgid "Image Files"
 msgstr "图像文件"
 
-#: src/menu-window.c:286
+#: src/menu-window.c:354
 msgid "Text Files"
 msgstr "文本文件"
 
-#: src/menu-window.c:432
+#: src/menu-window.c:500
 msgid "Search for applications in the menu"
 msgstr "搜索菜单中的应用程序"
 
-#: src/menu-window.c:437
+#: src/menu-window.c:505
 msgid "Click to see more features"
 msgstr "点击查看更多功能"
 
-#: src/menu-window.c:441
+#: src/menu-window.c:509
 msgid "View current user information"
 msgstr "查看当前用户信息"
 
