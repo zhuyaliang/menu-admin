@@ -99,12 +99,15 @@ width_size_mapping_set (const GValue       *value,
 {
     return g_variant_new_uint32 (g_value_get_double (value));
 }
-static GtkWidget *create_menu_width_spin (GSettings  *settings,
-                                          const char *key)
+static GtkWidget *create_menu_spin (GSettings  *settings,
+                                    double      min,
+                                    double      max,
+                                    double      step,
+                                    const char *key)
 {
     GtkWidget *spin;
 
-    spin = gtk_spin_button_new_with_range (220, 320, 10);
+    spin = gtk_spin_button_new_with_range (min, max, step);
     g_settings_bind_with_mapping (settings,
                                   key,
                                   spin,
@@ -128,6 +131,8 @@ menu_settings_response_cb (GtkDialog *dialog,
         g_settings_reset (settings,MENU_ICON_SIZE);
         g_settings_reset (settings,MENU_FONT_SIZE);
         g_settings_reset (settings,MENU_WIDTH_SIZE);
+        g_settings_reset (settings,MENU_COLUMN_SPACING);
+        g_settings_reset (settings,MENU_ROW_SPACING);
     }
     else if (response_id == GTK_RESPONSE_CLOSE)
     {
@@ -196,8 +201,26 @@ menu_admin_settings (GSimpleAction *action,
     /*setting menu width*/
     label = gtk_label_new(_("Menu width"));
     gtk_grid_attach(GTK_GRID(table), label, 0, 2, 1, 1);
-    spin = create_menu_width_spin (menuwin->priv->settings, MENU_WIDTH_SIZE);
+    spin = create_menu_spin (menuwin->priv->settings,
+                             220, 320, 10,
+                             MENU_WIDTH_SIZE);
     gtk_grid_attach(GTK_GRID(table), spin, 1, 2, 1, 1);
+
+    /*settings menu column*/
+    label = gtk_label_new(_("Menu column"));
+    gtk_grid_attach(GTK_GRID(table), label, 0, 3, 1, 1);
+    spin = create_menu_spin (menuwin->priv->settings,
+                             1, 50, 1,
+                             MENU_COLUMN_SPACING);
+    gtk_grid_attach(GTK_GRID(table), spin, 1, 3, 1, 1);
+
+    /*settings menu row*/
+    label = gtk_label_new(_("Menu row"));
+    gtk_grid_attach(GTK_GRID(table), label, 0, 4, 1, 1);
+    spin = create_menu_spin (menuwin->priv->settings,
+                             1, 15, 1,
+                             MENU_ROW_SPACING);
+    gtk_grid_attach(GTK_GRID(table), spin, 1, 4, 1, 1);
 
     gtk_widget_show_all (dialog);
 }
