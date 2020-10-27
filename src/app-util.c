@@ -388,6 +388,7 @@ menu_get_desktop_path_from_name (const char *dir,
     int   num = 1;
     char *path = NULL;
     char *new_name;
+    char *new_file_name;
 
     path = g_build_filename (dir, name, NULL);
     if (!g_file_test (path, G_FILE_TEST_EXISTS))
@@ -395,10 +396,12 @@ menu_get_desktop_path_from_name (const char *dir,
     g_free (path);
 
     while (TRUE)
-    {
-        new_name = g_strdup_printf ("-%d.%s", num, name);
+    {   
+        new_file_name = g_strndup (name,(strlen (name) - 8));
+        new_name = g_strdup_printf ("%s-%d.desktop", new_file_name, num);
         path = g_build_filename (dir, new_name, NULL);
         g_free (new_name);
+        g_free (new_file_name);
         if (!g_file_test (path, G_FILE_TEST_EXISTS))
             return path;
         g_free (path);
