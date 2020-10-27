@@ -20,6 +20,7 @@ struct _AppMenu
     char         *default_item;
     gint          icon_size;
     gint          font_size;
+    guint         width_size;
 };
 struct _AppMenuClass
 {
@@ -29,18 +30,19 @@ struct _AppMenuClass
 };
 G_DEFINE_TYPE (AppMenu, app_menu, G_TYPE_OBJECT)
 
-enum {
-  SHOW_MENU,
-  ADD_MENU,
-  CHANGED_MENU,
-  LAST_SIGNAL,
+enum 
+{
+    SHOW_MENU,
+    ADD_MENU,
+    CHANGED_MENU,
+    LAST_SIGNAL,
 };
 
 enum
 {   
-    COL_USER_FACE= 0,
-    LIST_LABEL ,
-    LIST_DATA ,
+    COL_USER_FACE = 0,
+    LIST_LABEL,
+    LIST_DATA,
     N_COLUMNS
 };
 typedef enum
@@ -62,6 +64,7 @@ static void list_view_init(GtkWidget *list,int renderer_size,guint icon_size)
 {
     GtkTreeViewColumn *column;
     GtkCellRenderer   *renderer_icon,*renderer_text;
+
     column=gtk_tree_view_column_new ();
 
     gtk_tree_view_column_set_sizing (GTK_TREE_VIEW_COLUMN (column),
@@ -73,11 +76,11 @@ static void list_view_init(GtkWidget *list,int renderer_size,guint icon_size)
                        column);
 
     renderer_icon = gtk_cell_renderer_pixbuf_new();   //user icon
-    g_object_set (G_OBJECT(renderer_icon),"stock-size",icon_size,NULL);
+    g_object_set (G_OBJECT(renderer_icon), "stock-size", icon_size, NULL);
     gtk_tree_view_column_pack_start (column, renderer_icon, FALSE);
     gtk_tree_view_column_set_attributes (column,
                                          renderer_icon,
-                                         "gicon",
+                                        "gicon",
                                          COL_USER_FACE,
                                          NULL);
     g_object_set_data (G_OBJECT (list),
@@ -85,7 +88,7 @@ static void list_view_init(GtkWidget *list,int renderer_size,guint icon_size)
                        renderer_icon);
 
     gtk_cell_renderer_set_fixed_size (renderer_icon,48,48);    
-    renderer_text = gtk_cell_renderer_text_new();     //user real name text
+    renderer_text = gtk_cell_renderer_text_new ();     //user real name text
     gtk_tree_view_column_pack_start(column,renderer_text,FALSE);
     gtk_tree_view_column_add_attribute(column,
                                        renderer_text,
@@ -634,7 +637,9 @@ static void create_category_tree (AppMenu *menu)
     //GtkTreeModel      *model;
    
     menu->category_store = create_store ();
-    menu->category_tree = create_empty_app_list (menu->category_store,210,menu->icon_size);
+    menu->category_tree = create_empty_app_list (menu->category_store,
+                                                (menu->width_size - 60),
+                                                 menu->icon_size);
     gtk_tree_view_set_hover_selection (GTK_TREE_VIEW(menu->category_tree),TRUE);
     selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(menu->category_tree));
     gtk_tree_selection_set_mode(selection,GTK_SELECTION_SINGLE);
@@ -828,7 +833,10 @@ static void create_search_tree (AppMenu *menu)
     GtkTreeSelection *selection;
 
     menu->search_store = create_store ();
-    menu->search_tree = create_empty_app_list (menu->search_store,270,menu->icon_size);
+    menu->search_tree = create_empty_app_list (menu->search_store,
+                                               menu->width_size,
+                                               menu->icon_size);
+
     gtk_tree_view_set_hover_selection (GTK_TREE_VIEW(menu->search_tree),TRUE);
     selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(menu->search_tree));
     gtk_tree_selection_set_mode(selection,GTK_SELECTION_SINGLE);
@@ -846,7 +854,9 @@ static void create_subapp_tree (AppMenu *menu)
     GtkTreeSelection *selection;
 
     menu->subapp_store = create_store ();
-    menu->subapp_tree = create_empty_app_list (menu->subapp_store,270,menu->icon_size);
+    menu->subapp_tree = create_empty_app_list (menu->subapp_store,
+                                               menu->width_size,
+                                               menu->icon_size);
     gtk_tree_view_set_hover_selection (GTK_TREE_VIEW(menu->subapp_tree),TRUE);
     selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(menu->subapp_tree));
     gtk_tree_selection_set_mode(selection,GTK_SELECTION_SINGLE);
@@ -910,6 +920,7 @@ app_menu_init (AppMenu *self)
     self->default_item = g_settings_get_string (self->settings,MENU_DEFAULT_ITEM);
     self->icon_size = g_settings_get_enum (self->settings, MENU_ICON_SIZE);
     self->font_size = g_settings_get_enum (self->settings, MENU_FONT_SIZE);
+    self->width_size = g_settings_get_uint (self->settings, MENU_WIDTH_SIZE);
     self->app_hash = g_hash_table_new (g_str_hash, g_str_equal);
 }
 static void
