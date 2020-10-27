@@ -23,27 +23,27 @@
             <summary>Menu items displayed by default</summary>
             <description>Open the menu item that the application menu displays by default</description>
         </key>
-        
+
         <key name="icon-size" enum="org.admin.menu.icon-size">
         <default>'32px'</default>
         <summary>Menu bar icon size</summary>
         <description>Set the size of an icon used in menu bar</description>
         </key>
-        
+
         <key name="width-size" type="u">
         <range min="220" max="320"/>
         <default>270</default>
         <summary>Menu bar width size</summary>
         <description>Set the width of the menu bar view</description>
         </key>
-        <!--  
+
         <key name="row-spacing" type="u">
-        <range min="220" max="320"/>
-        <default>270</default>
-        <summary>Menu bar width size</summary>
-        <description>Set the width of the menu bar view</description>
+        <range min="1" max="15"/>
+        <default>8</default>
+        <summary>Menu bar row spacing</summary>
+        <description>Set row spacing for menu bar icons and text</description>
         </key>
-        -->
+
         <key name="column-spacing" type="u">
         <range min="1" max="50"/>
         <default>10</default>
