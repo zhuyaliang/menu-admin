@@ -1,3 +1,4 @@
+data/org.menuadmin.gschema.xml.in
 src/app-menu.c  
 src/app-util.c  
 src/main.c  

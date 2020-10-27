@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: menu-admin\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-10-26 13:32+0800\n"
-"PO-Revision-Date: 2020-10-26 13:33+0800\n"
+"POT-Creation-Date: 2020-10-27 15:13+0800\n"
+"PO-Revision-Date: 2020-10-27 15:15+0800\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: none\n"
 "Language: zh_CN\n"
@@ -18,32 +18,76 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: Poedit 2.4.1\n"
 
-#: src/app-menu.c:234
+#: data/org.menuadmin.gschema.xml.in:23
+msgid "Menu items displayed by default"
+msgstr "默认显示的菜单项"
+
+#: data/org.menuadmin.gschema.xml.in:24
+msgid "Open the menu item that the application menu displays by default"
+msgstr "打开应用程序菜单默认显示的菜单项"
+
+#: data/org.menuadmin.gschema.xml.in:29
+msgid "Menu bar icon size"
+msgstr "菜单栏图标大小"
+
+#: data/org.menuadmin.gschema.xml.in:30
+msgid "Set the size of an icon used in menu bar"
+msgstr "设置菜单栏中使用的图标的大小"
+
+#: data/org.menuadmin.gschema.xml.in:36
+msgid "Menu width"
+msgstr "菜单宽度"
+
+#: data/org.menuadmin.gschema.xml.in:37
+msgid "Set the width of the menu bar view"
+msgstr "设置菜单栏视图宽度"
+
+#: data/org.menuadmin.gschema.xml.in:42
+msgid "Menu bar font size"
+msgstr "菜单栏字体大小"
+
+#: data/org.menuadmin.gschema.xml.in:43
+msgid "Set the size of an font used in menu bar"
+msgstr "设置菜单栏中使用的字体大小"
+
+#: src/app-menu.c:262
+msgid "add app to desktop"
+msgstr "将应用程序添加到桌面"
+
+#: src/app-menu.c:264
+msgid "Problem while copying launcher to desktop"
+msgstr "将启动器复制到桌面时出现问题"
+
+#: src/app-menu.c:286
 msgid "Add this launcher to _panel"
 msgstr "将此启动器添加到面板"
 
-#: src/app-menu.c:238
+#: src/app-menu.c:290
 msgid "Add this launcher to _desktop"
 msgstr "将此启动器添加到桌面"
 
-#: src/app-menu.c:245
+#: src/app-menu.c:299
+msgid "Preferences"
+msgstr "属性"
+
+#: src/app-menu.c:310
 msgid "_Entire menu"
 msgstr "整个菜单"
 
-#: src/app-menu.c:250
+#: src/app-menu.c:315
 msgid "Add this as _drawer to panel"
 msgstr "将此作为抽屉添加到面板"
 
-#: src/app-menu.c:254
+#: src/app-menu.c:319
 msgid "Add this as _menu to panel"
 msgstr "将此作为菜单添加到面板"
 
-#: src/app-util.c:258
+#: src/app-util.c:262
 #, c-format
 msgid "Could not open location '%s'"
 msgstr "无法打开位置 '%s'"
 
-#: src/app-util.c:288 src/app-util.c:369
+#: src/app-util.c:292 src/app-util.c:373
 msgid "No application to handle search folders is installed."
 msgstr "未安装处理搜索文件夹的应用程序."
 
