@@ -23,11 +23,20 @@
             <summary>Menu items displayed by default</summary>
             <description>Open the menu item that the application menu displays by default</description>
         </key>
+        
         <key name="icon-size" enum="org.admin.menu.icon-size">
         <default>'32px'</default>
         <summary>Menu bar icon size</summary>
         <description>Set the size of an icon used in menu bar</description>
         </key>
+        
+        <key name="menu-width" type="u">
+        <range min="220" max="320"/>
+        <default>270</default>
+        <summary>Menu width</summary>
+        <description>Set the width of the menu bar view</description>
+        </key>
+
         <key name="font-size" enum="org.admin.menu.font-size">
         <default>'medium'</default>
         <summary>Menu bar font size</summary>
