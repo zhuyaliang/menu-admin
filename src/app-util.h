@@ -11,6 +11,8 @@
 #define  MENU_ICON_SIZE                    "icon-size"
 #define  MENU_FONT_SIZE                    "font-size"
 #define  MENU_WIDTH_SIZE                   "width-size"
+#define  MENU_COLUMN_SPACING               "column-spacing"
+#define  MENU_ROW_SPACING                  "row-spacing"
 
 
 typedef GDesktopAppInfo GDAInfo;

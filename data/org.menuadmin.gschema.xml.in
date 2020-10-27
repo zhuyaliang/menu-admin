@@ -46,7 +46,7 @@
         -->
         <key name="column-spacing" type="u">
         <range min="1" max="50"/>
-        <default>8</default>
+        <default>10</default>
         <summary>Menu bar column spacing</summary>
         <description>Set column spacing for menu bar icons and text</description>
         </key>
