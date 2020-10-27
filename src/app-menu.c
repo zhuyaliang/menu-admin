@@ -35,7 +35,7 @@ enum
     SHOW_MENU,
     ADD_MENU,
     CHANGED_MENU,
-    LAST_SIGNAL,
+    LAST_SIGNAL
 };
 
 enum
@@ -172,10 +172,10 @@ static GtkWidget *create_empty_app_list (GtkListStore *store,
                                          int           icon_size)
 {   
     GtkWidget        *list;
-    
+
     list= gtk_tree_view_new_with_model(GTK_TREE_MODEL(store));
     list_view_init (list,renderer_size,icon_size);
-  
+
     return list;
 }
 static GtkListStore *create_store (void)
@@ -592,7 +592,6 @@ submenu_to_display (AppMenu *menu)
     }
 }
 
-
 static gboolean
 submenu_to_display_in_idle (gpointer data)
 {
@@ -635,7 +634,7 @@ static void create_category_tree (AppMenu *menu)
 {
     GtkTreeSelection *selection;
     //GtkTreeModel      *model;
-   
+
     menu->category_store = create_store ();
     menu->category_tree = create_empty_app_list (menu->category_store,
                                                 (menu->width_size - 60),
@@ -710,11 +709,13 @@ app_launch_desktop_file (const char  *desktop_file,
 
     if (g_path_is_absolute (desktop_file))
         appinfo = g_desktop_app_info_new_from_filename (desktop_file);
-    else {
+    else
+    {
         char *full;
 
         full = app_g_lookup_in_applications_dirs (desktop_file);
-        if (full) {
+        if (full)
+        {
             appinfo = g_desktop_app_info_new_from_filename (full);
             g_free (full);
         }
@@ -810,7 +811,7 @@ static void set_tree_signal_handle (GtkWidget *tree,AppMenu *menu)
                      "button_press_event",
                       G_CALLBACK (menuitem_button_press_event),
                       menu);
-    
+
     g_signal_connect (G_OBJECT (tree),
                      "drag_begin",
                       G_CALLBACK (drag_begin_menu_cb),
@@ -825,7 +826,6 @@ static void set_tree_signal_handle (GtkWidget *tree,AppMenu *menu)
                      "drag_end",
                       G_CALLBACK (drag_end_menu_cb),
                       NULL);
-
 
 }
 static void create_search_tree (AppMenu *menu)
@@ -873,7 +873,7 @@ handle_matemenu_tree_changed (MateMenuTree *tree,AppMenu *menu)
 {
     GError *error = NULL;
     guint idle_id;
-    
+
     gtk_list_store_clear (menu->subapp_store);
     gtk_list_store_clear (menu->category_store);
     if (! matemenu_tree_load_sync (tree, &error)) {
@@ -900,16 +900,21 @@ handle_matemenu_tree_changed (MateMenuTree *tree,AppMenu *menu)
 }
 static void
 app_menu_changed (AppMenu       *menu,
-                  guint         icon_size,
+                  guint          icon_size,
                   MateMenuTree  *tree)
 {
     GtkCellRenderer   *renderer_icon;
+    GtkTreeViewColumn *column;
 
     renderer_icon = g_object_get_data (G_OBJECT (menu->category_tree),"tree-list-renderer-icon");
     g_object_set (G_OBJECT(renderer_icon),"stock-size",icon_size,NULL);
-
     renderer_icon = g_object_get_data (G_OBJECT (menu->subapp_tree),"tree-list-renderer-icon");
     g_object_set (G_OBJECT(renderer_icon),"stock-size",icon_size,NULL);
+
+    column = g_object_get_data (G_OBJECT (menu->category_tree),"tree-list-column");
+    gtk_tree_view_column_set_fixed_width (GTK_TREE_VIEW_COLUMN (column), (menu->width_size - 60));
+    column = g_object_get_data (G_OBJECT (menu->subapp_tree),"tree-list-column");
+    gtk_tree_view_column_set_fixed_width (GTK_TREE_VIEW_COLUMN (column), menu->width_size);
 
     handle_matemenu_tree_changed (tree,menu);
 }
@@ -983,6 +988,14 @@ static void gsettings_font_size_changed (GSettings *settings,
     menu->font_size = g_settings_get_enum (settings,key);
     g_signal_emit (menu, signals[CHANGED_MENU], 0, menu->icon_size, NULL);
 }
+
+static void gsettings_width_size_changed (GSettings *settings,
+                                          gchar     *key,
+                                          AppMenu   *menu)
+{
+    menu->width_size = g_settings_get_uint (settings,key);
+    g_signal_emit (menu, signals[CHANGED_MENU], 0, menu->icon_size, NULL);
+}
 static void show_submenu (AppMenu *menu,MateMenuTreeDirectory *directory,gpointer data)
 {
     populate_menu_from_directory (menu,directory);
@@ -1006,6 +1019,11 @@ AppMenu *app_menu_new (void)
     g_signal_connect (menu->settings,
                       "changed::" MENU_FONT_SIZE,
                       G_CALLBACK (gsettings_font_size_changed),
+                      menu);
+
+    g_signal_connect (menu->settings,
+                      "changed::" MENU_WIDTH_SIZE,
+                      G_CALLBACK (gsettings_width_size_changed),
                       menu);
     return menu;
 }
@@ -1069,7 +1087,7 @@ create_applications_menu (const char   *menu_file,
     create_category_tree (menu);
     create_subapp_tree (menu);
     gtk_container_add (menu->container, menu->subapp_tree);
-    
+
     create_search_tree (menu);
     tree = matemenu_tree_new (menu_file, MATEMENU_TREE_FLAGS_SORT_DISPLAY_NAME);
     if (! matemenu_tree_load_sync (tree, &error)) 
