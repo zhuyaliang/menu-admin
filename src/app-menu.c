@@ -65,7 +65,8 @@ typedef char * (*LookupInDir) (const char *basename, const char *dir);
 static void list_view_init(GtkWidget *list,
                            int        renderer_size,
                            guint      icon_size,
-                           guint      column_spacing)
+                           guint      column_spacing,
+                           guint      row_spacing)
 {
     GtkTreeViewColumn *column;
     GtkCellRenderer   *renderer_icon,*renderer_text;
@@ -81,6 +82,7 @@ static void list_view_init(GtkWidget *list,
                        column);
 
     renderer_icon = gtk_cell_renderer_pixbuf_new();   //user icon
+    gtk_cell_renderer_set_padding (renderer_icon, row_spacing, row_spacing);
     g_object_set (G_OBJECT(renderer_icon), "stock-size", icon_size, NULL);
     gtk_tree_view_column_pack_start (column, renderer_icon, FALSE);
     gtk_tree_view_column_set_attributes (column,
@@ -91,8 +93,6 @@ static void list_view_init(GtkWidget *list,
     g_object_set_data (G_OBJECT (list),
                       "tree-list-renderer-icon",
                        renderer_icon);
-
-    gtk_cell_renderer_set_fixed_size (renderer_icon,48,48);    
     renderer_text = gtk_cell_renderer_text_new ();     //user real name text
     gtk_tree_view_column_pack_start(column,renderer_text,FALSE);
     gtk_tree_view_column_add_attribute(column,
@@ -175,12 +175,17 @@ static void refresh_app_list_data(GtkWidget   *list,
 static GtkWidget *create_empty_app_list (GtkListStore *store,
                                          guint         renderer_size,
                                          guint         icon_size,
-                                         guint         column_spacing)
+                                         guint         column_spacing,
+                                         guint         row_spacing)
 {   
     GtkWidget        *list;
 
     list= gtk_tree_view_new_with_model(GTK_TREE_MODEL(store));
-    list_view_init (list,renderer_size,icon_size,column_spacing);
+    list_view_init (list,
+                    renderer_size,
+                    icon_size,
+                    column_spacing,
+                    row_spacing);
 
     return list;
 }
@@ -645,7 +650,8 @@ static void create_category_tree (AppMenu *menu)
     menu->category_tree = create_empty_app_list (menu->category_store,
                                                 (menu->width_size - 60),
                                                  menu->icon_size,
-                                                 menu->column_spacing);
+                                                 menu->column_spacing,
+                                                 menu->row_spacing);
     gtk_tree_view_set_hover_selection (GTK_TREE_VIEW(menu->category_tree),TRUE);
     selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(menu->category_tree));
     gtk_tree_selection_set_mode(selection,GTK_SELECTION_SINGLE);
@@ -843,7 +849,8 @@ static void create_search_tree (AppMenu *menu)
     menu->search_tree = create_empty_app_list (menu->search_store,
                                                menu->width_size,
                                                menu->icon_size,
-                                               menu->column_spacing);
+                                               menu->column_spacing,
+                                               menu->row_spacing);
 
     gtk_tree_view_set_hover_selection (GTK_TREE_VIEW(menu->search_tree),TRUE);
     selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(menu->search_tree));
@@ -865,7 +872,8 @@ static void create_subapp_tree (AppMenu *menu)
     menu->subapp_tree = create_empty_app_list (menu->subapp_store,
                                                menu->width_size,
                                                menu->icon_size,
-                                               menu->column_spacing);
+                                               menu->column_spacing,
+                                               menu->row_spacing);
     gtk_tree_view_set_hover_selection (GTK_TREE_VIEW(menu->subapp_tree),TRUE);
     selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(menu->subapp_tree));
     gtk_tree_selection_set_mode(selection,GTK_SELECTION_SINGLE);
@@ -917,7 +925,9 @@ app_menu_changed (AppMenu       *menu,
 
     renderer_icon = g_object_get_data (G_OBJECT (menu->category_tree),"tree-list-renderer-icon");
     g_object_set (G_OBJECT(renderer_icon),"stock-size",icon_size,NULL);
+    gtk_cell_renderer_set_padding (renderer_icon, menu->row_spacing, menu->row_spacing);
     renderer_icon = g_object_get_data (G_OBJECT (menu->subapp_tree),"tree-list-renderer-icon");
+    gtk_cell_renderer_set_padding (renderer_icon, menu->row_spacing, menu->row_spacing);
     g_object_set (G_OBJECT(renderer_icon),"stock-size",icon_size,NULL);
 
     column = g_object_get_data (G_OBJECT (menu->category_tree),"tree-list-column");
@@ -938,7 +948,7 @@ app_menu_init (AppMenu *self)
     self->font_size = g_settings_get_enum (self->settings, MENU_FONT_SIZE);
     self->width_size = g_settings_get_uint (self->settings, MENU_WIDTH_SIZE);
     self->column_spacing = g_settings_get_uint (self->settings, MENU_COLUMN_SPACING);
-    //self->row_spacing= g_settings_get_uint (self->settings, MENU_ROW_SPACING);
+    self->row_spacing= g_settings_get_uint (self->settings, MENU_ROW_SPACING);
     self->app_hash = g_hash_table_new (g_str_hash, g_str_equal);
 }
 static void
@@ -1016,6 +1026,14 @@ static void gsettings_column_spacing_changed (GSettings *settings,
     menu->column_spacing = g_settings_get_uint (settings,key);
     g_signal_emit (menu, signals[CHANGED_MENU], 0, menu->icon_size, NULL);
 }
+
+static void gsettings_row_spacing_changed (GSettings *settings,
+                                              gchar     *key,
+                                              AppMenu   *menu)
+{
+    menu->row_spacing = g_settings_get_uint (settings,key);
+    g_signal_emit (menu, signals[CHANGED_MENU], 0, menu->icon_size, NULL);
+}
 static void show_submenu (AppMenu *menu,MateMenuTreeDirectory *directory,gpointer data)
 {
     populate_menu_from_directory (menu,directory);
@@ -1049,6 +1067,11 @@ AppMenu *app_menu_new (void)
     g_signal_connect (menu->settings,
                       "changed::" MENU_COLUMN_SPACING,
                       G_CALLBACK (gsettings_column_spacing_changed),
+                      menu);
+
+    g_signal_connect (menu->settings,
+                      "changed::" MENU_ROW_SPACING,
+                      G_CALLBACK (gsettings_row_spacing_changed),
                       menu);
     return menu;
 }
