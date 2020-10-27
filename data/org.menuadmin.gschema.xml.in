@@ -30,10 +30,10 @@
         <description>Set the size of an icon used in menu bar</description>
         </key>
         
-        <key name="menu-width" type="u">
+        <key name="width-size" type="u">
         <range min="220" max="320"/>
         <default>270</default>
-        <summary>Menu width</summary>
+        <summary>Menu bar width size</summary>
         <description>Set the width of the menu bar view</description>
         </key>
 
