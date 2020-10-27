@@ -79,6 +79,43 @@ static GtkWidget *create_style_combox (const char **style,
                                   NULL, NULL);
     return combox;
 }
+
+static gboolean
+width_size_mapping_get (GValue   *value,
+                        GVariant *variant,
+                        gpointer  user_data)
+{
+    guint width;
+
+    width = g_variant_get_uint32 (variant);
+    g_value_set_double (value, width);
+
+    return TRUE;
+}
+static GVariant *
+width_size_mapping_set (const GValue       *value,
+                        const GVariantType *expected_type,
+                        gpointer            user_data)
+{
+    return g_variant_new_uint32 (g_value_get_double (value));
+}
+static GtkWidget *create_menu_width_spin (GSettings  *settings,
+                                          const char *key)
+{
+    GtkWidget *spin;
+
+    spin = gtk_spin_button_new_with_range (220, 320, 10);
+    g_settings_bind_with_mapping (settings,
+                                  key,
+                                  spin,
+                                 "value",
+                                  G_SETTINGS_BIND_DEFAULT,
+                                  width_size_mapping_get,
+                                  width_size_mapping_set,
+                                  NULL, NULL);
+
+    return spin;
+}
 static void
 menu_settings_response_cb (GtkDialog *dialog,
                            gint       response_id,
@@ -90,6 +127,7 @@ menu_settings_response_cb (GtkDialog *dialog,
     {
         g_settings_reset (settings,MENU_ICON_SIZE);
         g_settings_reset (settings,MENU_FONT_SIZE);
+        g_settings_reset (settings,MENU_WIDTH_SIZE);
     }
     else if (response_id == GTK_RESPONSE_CLOSE)
     {
@@ -109,6 +147,7 @@ menu_admin_settings (GSimpleAction *action,
     GtkWidget  *table;
     GtkWidget  *combox;
     GtkWidget  *label;
+    GtkWidget  *spin;
 
     const char *font_style [] = {"xx-small","x-small","small","medium","large","x-large","xx-large",NULL};
     const char *icon_style [] = {"16px","24px","32px","48px",NULL};
@@ -153,6 +192,12 @@ menu_admin_settings (GSimpleAction *action,
                                   menuwin->priv->settings,
                                   MENU_ICON_SIZE);
     gtk_grid_attach(GTK_GRID(table), combox, 1, 1, 2, 1);
+
+    /*setting menu width*/
+    label = gtk_label_new(_("Menu width"));
+    gtk_grid_attach(GTK_GRID(table), label, 0, 2, 1, 1);
+    spin = create_menu_width_spin (menuwin->priv->settings, MENU_WIDTH_SIZE);
+    gtk_grid_attach(GTK_GRID(table), spin, 1, 2, 1, 1);
 
     gtk_widget_show_all (dialog);
 }
