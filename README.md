@@ -5,8 +5,10 @@ Calling ```mate-menus``` library to realize graphical menu management of applica
 
 ## Compile and install
 
-_**
+_
 meson build -Dprefix=/usr
+
 ninja -C build
+
 sudo ninja -C build install
-**_
+_
