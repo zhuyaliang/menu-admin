@@ -44,4 +44,12 @@ gboolean   menu_show_fm_search_uri          (const gchar  *fm,
                                              const gchar  *uri,
                                              guint32       timestamp,
                                              GError      **error);
+
+char      *menu_get_desktop_path_from_name  (const char   *dir,
+                                             const char   *source);
+
+gboolean   menu_desktop_file_copy           (const char   *source_path,
+                                             const char   *target_path,
+                                             GError      **error);
+
 #endif

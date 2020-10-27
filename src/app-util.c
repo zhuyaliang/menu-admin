@@ -1,8 +1,12 @@
+#include <glib.h>
+#include <glib/gstdio.h>
+#include <fcntl.h>
+#include <sys/types.h>
+#include <sys/stat.h>
 #include "app-util.h"
 #include "app-menu.h"
 
 #define MENU_GLIB_STR_EMPTY(x) ((x) == NULL || (x)[0] == '\0')
-
 static char *app_xdg_icon_remove_extension (const char *icon)
 {
     char *icon_no_extension;
@@ -375,4 +379,94 @@ menu_show_fm_search_uri (const gchar  *fm,
     g_object_unref (appinfo);
     g_list_free (uris);
     return ret;
+}
+
+char *
+menu_get_desktop_path_from_name (const char *dir,
+                                 const char *name)
+{
+    int   num = 1;
+    char *path = NULL;
+    char *new_name;
+
+    path = g_build_filename (dir, name, NULL);
+    if (!g_file_test (path, G_FILE_TEST_EXISTS))
+        return path;
+    g_free (path);
+
+    while (TRUE)
+    {
+        new_name = g_strdup_printf ("-%d.%s", num, name);
+        path = g_build_filename (dir, new_name, NULL);
+        g_free (new_name);
+        if (!g_file_test (path, G_FILE_TEST_EXISTS))
+            return path;
+        g_free (path);
+        num++;
+    }
+
+    return NULL;
+}
+
+static gboolean
+make_file_executable (GFile *file)
+{
+    GFileInfo *info;
+    guint32    current_perms;
+    guint32    new_perms;
+
+    info = g_file_query_info (file,
+                              G_FILE_ATTRIBUTE_STANDARD_TYPE","
+                              G_FILE_ATTRIBUTE_UNIX_MODE,
+                              G_FILE_QUERY_INFO_NOFOLLOW_SYMLINKS,
+                              NULL,
+                              NULL);
+
+    if (info == NULL)
+    {
+        g_warning ("Cannot mark %s executable", g_file_get_path (file));
+        return FALSE;
+    }
+
+    if (g_file_info_has_attribute (info, G_FILE_ATTRIBUTE_UNIX_MODE))
+    {
+        current_perms = g_file_info_get_attribute_uint32 (info,
+                                                  G_FILE_ATTRIBUTE_UNIX_MODE);
+        new_perms = current_perms | S_IXGRP | S_IXUSR | S_IXOTH;
+        if ((current_perms != new_perms) &&!g_file_set_attribute_uint32 (file,
+                                            G_FILE_ATTRIBUTE_UNIX_MODE,
+                                            new_perms,
+                                            G_FILE_QUERY_INFO_NOFOLLOW_SYMLINKS,
+                                            NULL, NULL))
+        {
+            g_warning ("Cannot mark %s executable", g_file_get_path (file));
+            g_object_unref (info);
+            return FALSE;
+        }
+    }
+
+    g_object_unref (info);
+    return TRUE;
+}
+
+gboolean
+menu_desktop_file_copy (const char  *source_path,
+                        const char  *target_path,
+                        GError     **error)
+{
+    GFile   *source;
+    GFile   *target;
+    gboolean res;
+
+    source = g_file_new_for_path (source_path);
+    target = g_file_new_for_path (target_path);
+    res = g_file_copy (source, target, G_FILE_COPY_OVERWRITE,
+                       NULL, NULL, NULL, error);
+    if (!res)
+        return res;
+    res = make_file_executable (target);
+    g_object_unref (source);
+    g_object_unref (target);
+
+    return res;
 }

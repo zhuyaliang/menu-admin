@@ -216,29 +216,92 @@ create_submenu (AppMenu          *menu,
 
 }
 
-static GtkWidget *
-create_item_context_menu (GtkWidget   *item)
+static void
+view_application_properties (GtkWidget         *item,
+                             MateMenuTreeEntry *entry)
 {
-    //MateMenuTreeEntry     *entry;
-    //MateMenuTreeDirectory *directory;
-    //MateMenuTree          *tree;
-    GtkWidget          *menu;
-    GtkWidget          *submenu;
-    GtkWidget          *menuitem;
-    //const char         *menu_filename;
+    GDesktopAppInfo  *ginfo;
+    const char       *desc;
+
+    ginfo = matemenu_tree_entry_get_app_info (entry);
+    desc= g_app_info_get_description(G_APP_INFO(ginfo));
+}
+
+static void
+add_app_to_desktop (GtkWidget      *item,
+                    MateMenuTreeEntry *entry)
+{
+    char       *target_dir;
+    const char *source;
+    char       *target;
+    GFile      *file;
+    char       *base_name;
+    GError     *error = NULL;
+    gboolean    res;
+    GdkScreen  *screen;
+
+    target_dir = g_strdup (g_get_user_special_dir (G_USER_DIRECTORY_DESKTOP));
+    source = matemenu_tree_entry_get_desktop_file_path (entry);
+    file = g_file_new_for_path (source);
+    base_name = g_file_get_basename (file);
+
+    target = menu_get_desktop_path_from_name (target_dir, base_name);
+
+    res = menu_desktop_file_copy (source, target, &error);
+
+    g_object_unref (file);
+    g_free (target_dir);
+    g_free (target);
+
+    if (!res)
+    {
+        screen = gtk_widget_get_screen (item);
+        menu_error_dialog (NULL, screen,
+                           _("add app to desktop"),
+                           TRUE,
+                           _("Problem while copying launcher to desktop"),
+                           error->message);
+    }
+}
+
+static GtkWidget *
+create_item_context_menu (GtkWidget *tree,
+                          AppMenu   *appmenu)
+{
+    MateMenuTreeEntry *entry;
+    GtkWidget         *menu;
+    GtkWidget         *submenu;
+    GtkWidget         *menuitem;
+
+    entry = g_object_get_data (G_OBJECT (appmenu), "panel-menu-tree-entry");
+    if (!entry)
+        return NULL;
 
     menu = gtk_menu_new ();
-    g_signal_connect (item, "destroy",
-              G_CALLBACK (gtk_widget_destroy), menu);
+    g_signal_connect (tree, "destroy",
+                      G_CALLBACK (gtk_widget_destroy), menu);
 
     menuitem = gtk_menu_item_new_with_mnemonic (_("Add this launcher to _panel"));
     gtk_menu_shell_append (GTK_MENU_SHELL (menu), menuitem);
     gtk_widget_show (menuitem);
     
     menuitem = gtk_menu_item_new_with_mnemonic (_("Add this launcher to _desktop"));
+    g_signal_connect (menuitem,
+                     "activate",
+                      G_CALLBACK (add_app_to_desktop),
+                      entry);
+
     gtk_menu_shell_append (GTK_MENU_SHELL (menu), menuitem);
     gtk_widget_show (menuitem);
 
+    menuitem = gtk_menu_item_new_with_mnemonic (_("Preferences"));
+    g_signal_connect (menuitem,
+                     "activate",
+                      G_CALLBACK (view_application_properties),
+                      entry);
+
+    gtk_menu_shell_append (GTK_MENU_SHELL (menu), menuitem);
+    gtk_widget_show (menuitem);
 
     submenu = gtk_menu_new ();
 
@@ -259,8 +322,9 @@ create_item_context_menu (GtkWidget   *item)
 }
 
 static gboolean
-show_item_menu (GtkWidget      *item,
-                GdkEvent *event)
+show_item_menu (GtkWidget  *tree,
+                GdkEvent   *event,
+                AppMenu    *appmenu)
 {
     GtkWidget   *menu;
     GtkWidget   *window;
@@ -269,8 +333,8 @@ show_item_menu (GtkWidget      *item,
     GdkVisual   *visual;
     GtkStyleContext *context;
 
-    menu = create_item_context_menu (item);
-    window  = gtk_widget_get_toplevel (GTK_WIDGET (item));
+    menu = create_item_context_menu (tree,appmenu);
+    window  = gtk_widget_get_toplevel (GTK_WIDGET (tree));
     gtk_menu_set_screen (GTK_MENU (menu),gtk_window_get_screen (GTK_WINDOW (window)));
     /* Set up theme and transparency support */
     toplevel = gtk_widget_get_toplevel (menu);
@@ -288,11 +352,12 @@ show_item_menu (GtkWidget      *item,
 }
 
 static gboolean
-menuitem_button_press_event (GtkWidget      *menuitem,
-                             GdkEventButton *event)
+menuitem_button_press_event (GtkWidget      *tree,
+                             GdkEventButton *event,
+                             AppMenu        *menu)
 {
     if (event->button == 3)
-        return show_item_menu (menuitem, (GdkEvent *) event);
+        return show_item_menu (tree, (GdkEvent *) event, menu);
 
     return FALSE;
 }
@@ -574,9 +639,9 @@ static void create_category_tree (AppMenu *menu)
     selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(menu->category_tree));
     gtk_tree_selection_set_mode(selection,GTK_SELECTION_SINGLE);
     //model=gtk_tree_view_get_model(GTK_TREE_VIEW(menu->category_tree));
-    g_signal_connect(selection, 
-                    "changed", 
-                     G_CALLBACK(view_submenu), 
+    g_signal_connect(selection,
+                    "changed",
+                     G_CALLBACK(view_submenu),
                      menu);
     gtk_box_pack_start (menu->box, menu->category_tree, FALSE, FALSE, 0);
     gtk_widget_show (menu->category_tree);
