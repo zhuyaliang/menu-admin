@@ -3,10 +3,10 @@ gnome = import('gnome')
 resources = gnome.compile_resources(
   'nautilus-resources',
   join_paths(
-    'resources', 'nautilus.gresource.xml'
+    'resources', 'menu-admin.gresource.xml'
   ),
   source_dir: 'resources',
-  c_name: 'nautilus',
+  c_name: 'menu_admin',
   extra_args: '--generate-source'
 )
 

@@ -202,4 +202,269 @@
     </child>
 	 
   </object>
+  <object class="GtkPopoverMenu" id="popover-system">
+    <child>
+      <object class="GtkBox">
+        <property name="visible">True</property>
+        <property name="orientation">vertical</property>
+        <property name="margin">10</property>
+        <child>
+          <object class="GtkBox">
+            <property name="visible">True</property>
+            <property name="orientation">horizontal</property>
+            <property name="valign">center</property>
+            <property name="margin-start">12</property>
+            <property name="margin-end">12</property>
+            <property name="margin-top">6</property>
+            <property name="spacing">6</property>
+            <property name="margin-bottom">3</property>
+              <child>
+                <object class="GtkImage">
+                  <property name="visible">True</property>
+                   <property name="valign">center</property>
+                  <property name="icon-size">1</property>
+                  <property name="icon-name">user-info</property>
+                </object>
+              </child>
+              <child>
+                 <object class="GtkModelButton">
+                   <property name="visible">True</property>
+                   <property name="valign">center</property>
+                   <property name="action-name">win.system-user-info</property>
+                   <property name="text" translatable="yes">User Info</property>
+                 </object>
+              </child>
+          </object>
+        </child>
+        <child>
+          <object class="GtkSeparator">
+            <property name="visible">True</property>
+            <property name="orientation">horizontal</property>
+            <property name="margin-start">12</property>
+            <property name="margin-end">12</property>
+            <property name="margin-top">3</property>
+            <property name="margin-bottom">3</property>
+          </object>
+        </child>
+        <child>
+          <object class="GtkBox">
+            <property name="visible">True</property>
+            <property name="orientation">horizontal</property>
+            <property name="valign">center</property>
+            <property name="margin-start">12</property>
+            <property name="margin-end">12</property>
+            <property name="margin-top">6</property>
+            <property name="spacing">6</property>
+            <property name="margin-bottom">3</property>
+              <child>
+                <object class="GtkImage">
+                  <property name="visible">True</property>
+                   <property name="valign">center</property>
+                  <property name="icon-size">1</property>
+                  <property name="icon-name">gnome-settings</property>
+                </object>
+              </child>
+              <child>
+                 <object class="GtkModelButton">
+                   <property name="visible">True</property>
+                   <property name="valign">center</property>
+                   <property name="action-name">win.system-settings</property>
+                   <property name="text" translatable="yes">System-settings</property>
+                 </object>
+              </child>
+          </object>
+        </child>
+        <child>
+          <object class="GtkSeparator">
+            <property name="visible">True</property>
+            <property name="orientation">horizontal</property>
+            <property name="margin-start">12</property>
+            <property name="margin-end">12</property>
+            <property name="margin-top">3</property>
+            <property name="margin-bottom">3</property>
+          </object>
+        </child>
+        <child>
+          <object class="GtkBox">
+            <property name="visible">True</property>
+            <property name="orientation">horizontal</property>
+            <property name="valign">center</property>
+            <property name="margin-start">12</property>
+            <property name="margin-end">12</property>
+            <property name="margin-top">6</property>
+            <property name="spacing">6</property>
+            <property name="margin-bottom">3</property>
+              <child>
+                <object class="GtkImage">
+                  <property name="visible">True</property>
+                   <property name="valign">center</property>
+                  <property name="icon-size">1</property>
+                  <property name="icon-name">system-switch-user-symbolic</property>
+                </object>
+              </child>
+              <child>
+                 <object class="GtkModelButton">
+                   <property name="visible">True</property>
+                   <property name="valign">center</property>
+                   <property name="action-name">win.system-switch-user</property>
+                   <property name="text" translatable="yes">switch user</property>
+                 </object>
+              </child>
+          </object>
+      </child>
+        <child>
+          <object class="GtkBox">
+            <property name="visible">True</property>
+            <property name="orientation">horizontal</property>
+            <property name="valign">center</property>
+            <property name="margin-start">12</property>
+            <property name="margin-end">12</property>
+            <property name="margin-top">6</property>
+            <property name="spacing">6</property>
+            <property name="margin-bottom">3</property>
+              <child>
+                <object class="GtkImage">
+                  <property name="visible">True</property>
+                   <property name="valign">center</property>
+                  <property name="icon-size">1</property>
+                  <property name="icon-name">system-log-out</property>
+                </object>
+              </child>
+              <child>
+                 <object class="GtkModelButton">
+                   <property name="visible">True</property>
+                   <property name="valign">center</property>
+                   <property name="action-name">win.system-log-out</property>
+                   <property name="text" translatable="yes">Log Out</property>
+                 </object>
+              </child>
+          </object>
+        </child>
+        <child>
+          <object class="GtkBox">
+            <property name="visible">True</property>
+            <property name="orientation">horizontal</property>
+            <property name="valign">center</property>
+            <property name="margin-start">12</property>
+            <property name="margin-end">12</property>
+            <property name="margin-top">6</property>
+            <property name="spacing">6</property>
+            <property name="margin-bottom">3</property>
+              <child>
+                <object class="GtkImage">
+                  <property name="visible">True</property>
+                   <property name="valign">center</property>
+                  <property name="icon-size">1</property>
+                  <property name="icon-name">system-lock-screen</property>
+                </object>
+              </child>
+              <child>
+                 <object class="GtkModelButton">
+                   <property name="visible">True</property>
+                   <property name="valign">center</property>
+                   <property name="action-name">win.system-lock-screen</property>
+                   <property name="text" translatable="yes">lock screen</property>
+                 </object>
+              </child>
+          </object>
+        </child>
+        <child>
+          <object class="GtkBox">
+            <property name="visible">True</property>
+            <property name="orientation">horizontal</property>
+            <property name="valign">center</property>
+            <property name="margin-start">12</property>
+            <property name="margin-end">12</property>
+            <property name="margin-top">6</property>
+            <property name="spacing">6</property>
+            <property name="margin-bottom">3</property>
+              <child>
+                <object class="GtkImage">
+                  <property name="visible">True</property>
+                   <property name="valign">center</property>
+                  <property name="icon-size">1</property>
+                  <property name="icon-name">gnome-session-hibernate</property>
+                </object>
+              </child>
+              <child>
+                 <object class="GtkModelButton">
+                   <property name="visible">True</property>
+                   <property name="valign">center</property>
+                   <property name="action-name">win.system-suspend</property>
+                   <property name="text" translatable="yes">Suspend</property>
+                 </object>
+              </child>
+          </object>
+        </child>
+        <child>
+          <object class="GtkBox">
+            <property name="visible">True</property>
+            <property name="orientation">horizontal</property>
+            <property name="valign">center</property>
+            <property name="margin-start">12</property>
+            <property name="margin-end">12</property>
+            <property name="margin-top">6</property>
+            <property name="spacing">6</property>
+            <property name="margin-bottom">3</property>
+              <child>
+                <object class="GtkImage">
+                  <property name="visible">True</property>
+                   <property name="valign">center</property>
+                  <property name="icon-size">1</property>
+                  <property name="icon-name">system-reboot</property>
+                </object>
+              </child>
+              <child>
+                 <object class="GtkModelButton">
+                   <property name="visible">True</property>
+                   <property name="valign">center</property>
+                   <property name="action-name">win.system-reboot</property>
+                   <property name="text" translatable="yes">reboot</property>
+                 </object>
+              </child>
+          </object>
+        </child>
+        <child>
+          <object class="GtkBox">
+            <property name="visible">True</property>
+            <property name="orientation">horizontal</property>
+            <property name="valign">center</property>
+            <property name="margin-start">12</property>
+            <property name="margin-end">12</property>
+            <property name="margin-top">6</property>
+            <property name="spacing">6</property>
+            <property name="margin-bottom">3</property>
+              <child>
+                <object class="GtkImage">
+                  <property name="visible">True</property>
+                   <property name="valign">center</property>
+                  <property name="icon-size">1</property>
+                  <property name="icon-name">system-shutdown</property>
+                </object>
+              </child>
+              <child>
+                 <object class="GtkModelButton">
+                   <property name="visible">True</property>
+                   <property name="valign">center</property>
+                   <property name="action-name">win.system-shudown</property>
+                   <property name="text" translatable="yes">shutdown</property>
+                 </object>
+              </child>
+          </object>
+        </child>
+        <child>
+          <object class="GtkSeparator">
+            <property name="visible">True</property>
+            <property name="orientation">horizontal</property>
+            <property name="margin-start">12</property>
+            <property name="margin-end">12</property>
+            <property name="margin-top">3</property>
+            <property name="margin-bottom">3</property>
+          </object>
+        </child>
+
+      </object>
+    </child>
+	 
+  </object>
 </interface>

@@ -14,6 +14,7 @@ struct _MenuWindowPrivate
     AppMenu    *menu;
     GtkWidget  *stack;
     GSettings  *settings;
+    GtkBuilder *builder;
 };
 
 G_DEFINE_TYPE_WITH_PRIVATE (MenuWindow, menu_window, GTK_TYPE_WINDOW)
@@ -407,16 +408,17 @@ static const GActionEntry actions[] = {
   { "menu-admin-recent-open", menu_admin_recent_open}
 };
 
-static GtkWidget *create_menu_button (MenuWindow *menuwin)
+static GtkWidget *create_menu_button (MenuWindow *menuwin,
+                                      const char *object_id,
+                                      const char *icon)
 {
     GtkWidget  *menu_button;
     GtkWidget  *image;
-    GtkBuilder *builder;
     GtkWidget  *popover;
     GSimpleActionGroup *action_group;
 
     menu_button = gtk_menu_button_new ();
-    image  = gtk_image_new_from_icon_name ("open-menu-symbolic", GTK_ICON_SIZE_BUTTON);
+    image  = gtk_image_new_from_icon_name (icon, GTK_ICON_SIZE_BUTTON);
     gtk_button_set_image (GTK_BUTTON (menu_button), image);
     gtk_button_set_relief (GTK_BUTTON(menu_button),GTK_RELIEF_NONE);
     action_group = g_simple_action_group_new ();
@@ -426,8 +428,7 @@ static GtkWidget *create_menu_button (MenuWindow *menuwin)
                                      menuwin);
 
     gtk_widget_insert_action_group (GTK_WIDGET(menuwin), "win", G_ACTION_GROUP (action_group));
-    builder = gtk_builder_new_from_resource ("/org/admin/menu/menu-admin-function-manager.ui");
-    popover = (GtkWidget *)gtk_builder_get_object (builder, "popover");
+    popover = (GtkWidget *)gtk_builder_get_object (menuwin->priv->builder, object_id);
     gtk_menu_button_set_popover (GTK_MENU_BUTTON (menu_button), popover);
 
     return menu_button;
@@ -501,13 +502,13 @@ static GtkWidget *create_manager_menu (MenuWindow *menuwin,GtkWidget *stack)
     gtk_button_set_relief (GTK_BUTTON(search_button),GTK_RELIEF_NONE);
     gtk_grid_attach(GTK_GRID(table), search_button, 0, 1, 1, 1);
 
-    menu_button = create_menu_button (menuwin);
+    menu_button = create_menu_button (menuwin, "popover", "open-menu-symbolic");
     gtk_widget_set_tooltip_text (menu_button,_("Click to see more features"));
     gtk_grid_attach(GTK_GRID(table), menu_button, 1, 1, 1, 1);
 
-    user_button = set_button_style ("avatar-default-symbolic");
+    user_button = create_menu_button (menuwin, "popover-system", "system");
     gtk_widget_set_tooltip_text (user_button,_("View current user information"));
-    gtk_button_set_relief (GTK_BUTTON(user_button),GTK_RELIEF_NONE);
+    //gtk_button_set_relief (GTK_BUTTON(user_button),GTK_RELIEF_NONE);
     gtk_grid_attach(GTK_GRID(table), user_button, 2, 1, 1, 1);
 
     searchbar = create_search_bar (menuwin);
@@ -656,6 +657,7 @@ menu_window_init (MenuWindow *menuwin)
 
     menuwin->priv = menu_window_get_instance_private (menuwin);
     menuwin->priv->settings = g_settings_new (MENU_ADMID_SCHEMA);
+    menuwin->priv->builder = gtk_builder_new_from_resource ("/org/admin/menu/menu-admin-function-manager.ui");
 
     window = GTK_WINDOW (menuwin);
     gtk_window_set_type_hint (window, GDK_WINDOW_TYPE_HINT_MENU);
