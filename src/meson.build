@@ -16,6 +16,7 @@ sources = [
 'app-menu.c',
 'app-util.c',
 'menu-window.c',
+'menu-tool.c',
  resources,
 ]
 

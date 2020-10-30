@@ -446,7 +446,7 @@
                  <object class="GtkModelButton">
                    <property name="visible">True</property>
                    <property name="valign">center</property>
-                   <property name="action-name">win.system-shudown</property>
+                   <property name="action-name">win.system-shutdown</property>
                    <property name="text" translatable="yes">shutdown</property>
                  </object>
               </child>

@@ -6,6 +6,7 @@
 #include "menu-window.h"
 #include "app-menu.h"
 #include "app-util.h"
+#include "menu-tool.h"
 #include "config.h"
 
 
@@ -401,11 +402,19 @@ menu_admin_network (GSimpleAction *action,
     menu_admin_fm_open ("network://",GTK_WIDGET (user_data));
 }
 static const GActionEntry actions[] = {
-  { "menu-admin-about", menu_admin_about},
+  { "menu-admin-about",    menu_admin_about},
   { "menu-admin-settings", menu_admin_settings},
   { "menu-admin-computer", menu_admin_computer},
-  { "menu-admin-network", menu_admin_network},
-  { "menu-admin-recent-open", menu_admin_recent_open}
+  { "menu-admin-network",  menu_admin_network},
+  { "menu-admin-recent-open", menu_admin_recent_open},
+  { "system-user-info",    system_user_info },
+  { "system-settings",     system_settings},
+  { "system-switch-user",  system_switch_user},
+  { "system-log-out",      system_log_out},
+  { "system-lock-screen",  system_lock_screen},
+  { "system-suspend",      system_suspend},
+  { "system-reboot",       system_reboot},
+  { "system-shutdown",     system_shutdown},
 };
 
 static GtkWidget *create_menu_button (MenuWindow *menuwin,
