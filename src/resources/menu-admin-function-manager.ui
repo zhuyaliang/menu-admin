@@ -209,7 +209,7 @@
         <property name="orientation">vertical</property>
         <property name="margin">10</property>
         <child>
-          <object class="GtkBox">
+          <object class="GtkBox" id="user-info">
             <property name="visible">True</property>
             <property name="orientation">horizontal</property>
             <property name="valign">center</property>
@@ -285,7 +285,7 @@
           </object>
         </child>
         <child>
-          <object class="GtkBox">
+          <object class="GtkBox" id="switch-user">
             <property name="visible">True</property>
             <property name="orientation">horizontal</property>
             <property name="valign">center</property>
@@ -313,7 +313,7 @@
           </object>
       </child>
         <child>
-          <object class="GtkBox">
+          <object class="GtkBox" id="log-out">
             <property name="visible">True</property>
             <property name="orientation">horizontal</property>
             <property name="valign">center</property>
@@ -341,7 +341,7 @@
           </object>
         </child>
         <child>
-          <object class="GtkBox">
+          <object class="GtkBox" id="lock-screen">
             <property name="visible">True</property>
             <property name="orientation">horizontal</property>
             <property name="valign">center</property>
@@ -369,7 +369,7 @@
           </object>
         </child>
         <child>
-          <object class="GtkBox">
+          <object class="GtkBox" id="suspend">
             <property name="visible">True</property>
             <property name="orientation">horizontal</property>
             <property name="valign">center</property>
@@ -397,7 +397,7 @@
           </object>
         </child>
         <child>
-          <object class="GtkBox">
+          <object class="GtkBox" id="reboot">
             <property name="visible">True</property>
             <property name="orientation">horizontal</property>
             <property name="valign">center</property>
@@ -425,7 +425,7 @@
           </object>
         </child>
         <child>
-          <object class="GtkBox">
+          <object class="GtkBox" id="shutdown">
             <property name="visible">True</property>
             <property name="orientation">horizontal</property>
             <property name="valign">center</property>
