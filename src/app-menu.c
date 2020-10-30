@@ -2,12 +2,12 @@
 #include <matemenu-tree.h>
 #include "app-menu.h"
 #include "app-util.h"
- 
+
 struct _AppMenu
 {
     GObject       parent;
     GtkContainer *container;
-    GtkBox       *box;    
+    GtkBox       *box;
     GtkWidget    *category_tree;
     GtkWidget    *subapp_tree;
     GtkWidget    *search_tree;
@@ -156,10 +156,10 @@ static void refresh_app_list_data(GtkWidget   *list,
     ellipsize = get_ellipsize_app_name (app_name,14,ELLIPSIZE_MIDDLE);
     label =  g_markup_printf_escaped("<span color = \'grey\' size=\"%s\" weight='bold'>%s</span>",font_size[index],ellipsize);
     gtk_list_store_append(store, &iter);
-    gtk_list_store_set(store, 
+    gtk_list_store_set(store,
                        &iter,
                        COL_USER_FACE, icon,  //icon
-                       LIST_DATA, data,  
+                       LIST_DATA, data,
                        LIST_LABEL,label,     //two name
                        -1);
     selection = gtk_tree_view_get_selection (GTK_TREE_VIEW(list));
@@ -177,7 +177,7 @@ static GtkWidget *create_empty_app_list (GtkListStore *store,
                                          guint         icon_size,
                                          guint         column_spacing,
                                          guint         row_spacing)
-{   
+{
     GtkWidget        *list;
 
     list= gtk_tree_view_new_with_model(GTK_TREE_MODEL(store));
@@ -210,7 +210,6 @@ create_submenu_entry (AppMenu               *menu,
                            menu->default_item,
                            menu->font_size,
                           (gpointer)directory);
-
 
     return menu->category_tree;
 }
@@ -298,7 +297,7 @@ create_item_context_menu (GtkWidget *tree,
     menuitem = gtk_menu_item_new_with_mnemonic (_("Add this launcher to _panel"));
     gtk_menu_shell_append (GTK_MENU_SHELL (menu), menuitem);
     gtk_widget_show (menuitem);
-    
+
     menuitem = gtk_menu_item_new_with_mnemonic (_("Add this launcher to _desktop"));
     g_signal_connect (menuitem,
                      "activate",
@@ -710,7 +709,7 @@ static gboolean
 app_launch_desktop_file (const char  *desktop_file,
                GdkScreen   *screen,
                GError     **error)
-{            
+{
     GDesktopAppInfo *appinfo;
     gboolean         retval;
 
@@ -814,7 +813,7 @@ static void set_tree_signal_handle (GtkWidget *tree,AppMenu *menu)
                          GDK_BUTTON1_MASK | GDK_BUTTON2_MASK,
                          menu_item_targets, 1,
                          GDK_ACTION_COPY);
- 
+
     g_signal_connect (tree,
                      "row-activated",
                       G_CALLBACK (activate_app_def),
@@ -1063,7 +1062,7 @@ AppMenu *app_menu_new (void)
                       "changed::" MENU_WIDTH_SIZE,
                       G_CALLBACK (gsettings_width_size_changed),
                       menu);
-    
+
     g_signal_connect (menu->settings,
                       "changed::" MENU_COLUMN_SPACING,
                       G_CALLBACK (gsettings_column_spacing_changed),

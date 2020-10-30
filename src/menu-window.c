@@ -32,7 +32,7 @@ static void set_box_background (GtkWidget *box)
     gtk_css_provider_load_from_data (provider, css, -1, NULL);
     gtk_style_context_add_provider (context,
                                     GTK_STYLE_PROVIDER (provider),
-		                            GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
+                                    GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
     g_object_unref (provider);
     g_free (css);
 }
@@ -232,7 +232,6 @@ menu_admin_about (GSimpleAction *action,
                   GVariant      *parameter,
                   gpointer       user_data)
 {
-    
     GtkWindow *parent = GTK_WINDOW (user_data);
 
     static const gchar* artists[] = {
