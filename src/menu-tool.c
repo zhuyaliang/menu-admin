@@ -71,4 +71,20 @@ void set_system_lockdown (GtkBuilder *builder)
                            "visible",
                             G_BINDING_SYNC_CREATE|G_BINDING_INVERT_BOOLEAN);
 
+    widget = (GtkWidget *)gtk_builder_get_object (builder, "log-out");
+
+    g_object_bind_property (lockdown,
+                           "disable-log-out",
+                            widget,
+                           "visible",
+                            G_BINDING_SYNC_CREATE|G_BINDING_INVERT_BOOLEAN);
+
+    widget = (GtkWidget *)gtk_builder_get_object (builder, "lock-screen");
+
+    g_object_bind_property (lockdown,
+                           "disable-lock-screen",
+                            widget,
+                           "visible",
+                            G_BINDING_SYNC_CREATE|G_BINDING_INVERT_BOOLEAN);
+
 }
