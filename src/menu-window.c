@@ -516,7 +516,6 @@ static GtkWidget *create_manager_menu (MenuWindow *menuwin,GtkWidget *stack)
 
     user_button = create_menu_button (menuwin, "popover-system", "system");
     gtk_widget_set_tooltip_text (user_button,_("View current user information"));
-    //gtk_button_set_relief (GTK_BUTTON(user_button),GTK_RELIEF_NONE);
     gtk_grid_attach(GTK_GRID(table), user_button, 2, 1, 1, 1);
 
     searchbar = create_search_bar (menuwin);
@@ -529,6 +528,7 @@ static GtkWidget *create_manager_menu (MenuWindow *menuwin,GtkWidget *stack)
                            "search-mode-enabled",
                             G_BINDING_BIDIRECTIONAL);
 
+    set_system_lockdown (menuwin->priv->builder);
     return table;
 }
 

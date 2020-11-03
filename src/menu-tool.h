@@ -35,4 +35,6 @@ void        system_reboot              (GSimpleAction   *action,
 void        system_shutdown            (GSimpleAction   *action,
                                         GVariant        *parameter,
                                         gpointer         user_data);
+
+void        set_system_lockdown        (GtkBuilder      *builder);
 #endif

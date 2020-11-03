@@ -1042,7 +1042,6 @@ AppMenu *app_menu_new (void)
     AppMenu *menu;
 
     menu = g_object_new (APP_TYPE_MENU,NULL);
-
     g_signal_connect (menu,
                      "show-menu",
                       G_CALLBACK (show_submenu),
