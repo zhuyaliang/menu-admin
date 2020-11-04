@@ -156,6 +156,29 @@ system_log_out (GSimpleAction *action,
                        (GAsyncReadyCallback) logout_ready_callback,
                        manager);
 }
+
+static void
+lock_ready_callback (GObject      *source_object,
+                     GAsyncResult *res,
+                     gpointer      user_data)
+{
+    GDBusProxy *proxy = G_DBUS_PROXY (user_data);
+    GError     *error = NULL;
+    GVariant   *ret;
+
+    ret = g_dbus_proxy_call_finish (proxy, res, &error);
+    if (ret)
+    {
+        g_variant_unref (ret);
+    }
+
+    if (error)
+    {
+        g_warning ("Could not ask screensaver to lock: %s",
+            error->message);
+        g_error_free (error);
+    }
+}
 void
 system_lock_screen (GSimpleAction *action,
                     GVariant      *parameter,
@@ -163,8 +186,6 @@ system_lock_screen (GSimpleAction *action,
 {
     MenuSessionManager *manager = NULL;
     GDBusProxy *proxy;
-    GError *error = NULL;
-    GVariant *ret;
 
     manager = menu_session_manager_get ();
 
@@ -182,23 +203,15 @@ system_lock_screen (GSimpleAction *action,
         return;
     }
 
-    ret = g_dbus_proxy_call_sync (proxy,
-                        "Lock",
-                        NULL,
-                        G_DBUS_CALL_FLAGS_NONE,
-                        -1,
-                        NULL,
-                        &error);
+    g_dbus_proxy_call (proxy,
+                      "Lock",
+                       NULL,
+                       G_DBUS_CALL_FLAGS_NONE,
+                       -1,
+                       NULL,
+                       (GAsyncReadyCallback) lock_ready_callback,
+                       proxy);
 
-    if (ret)
-        g_variant_unref (ret);
-
-    if (error)
-    {
-        g_warning ("Could not ask screensaver to lock: %s",
-            error->message);
-        g_error_free (error);
-    }
 }
 void
 system_suspend (GSimpleAction *action,
