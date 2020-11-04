@@ -23,7 +23,7 @@ sources = [
 
 executable('menu-admin',
   sources : sources,
-  dependencies : [gtk_deps,md_deps,polkit_deps],
+  dependencies : [gtk_deps,md_deps,polkit_deps,gdm_deps,lightdm_deps],
   include_directories: top_srcdir,
   install : true,
   install_dir : get_option('bindir')

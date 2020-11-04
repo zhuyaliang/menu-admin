@@ -90,8 +90,9 @@ add_global_link_arguments(
 gtk_req_version = '>= 3.0.0'
 gtk_deps = dependency('gtk+-3.0', version: gtk_req_version)
 md_deps = dependency('libmate-menu')
+gdm_deps = dependency('gdm')
+lightdm_deps = dependency('liblightdm-gobject-1')
 polkit_deps = dependency('polkit-gobject-1')
-
 # Configure data
 conf = configuration_data()
 conf.set_quoted('VERSION', meson.project_version())
