@@ -10,6 +10,11 @@
 
 #define  DMFILE    "/etc/systemd/system/display-manager.service"
 
+struct _MenuSessionManagerPrivate {
+    GDBusProxy *session_proxy;
+};
+
+G_DEFINE_TYPE (MenuSessionManager, menu_session_manager, G_TYPE_OBJECT);
 typedef enum
 {
     GDM,
@@ -104,11 +109,50 @@ system_switch_user (GSimpleAction *action,
         g_error_free (error);
     }
 }
+static void
+logout_ready_callback (GObject      *source_object,
+                       GAsyncResult *res,
+                       gpointer      user_data)
+{
+    MenuSessionManager *manager = (MenuSessionManager *) user_data;
+    GError *error = NULL;
+    GVariant *ret;
+
+    ret = g_dbus_proxy_call_finish (manager->priv->session_proxy, res, &error);
+    if (ret)
+    {
+        g_variant_unref (ret);
+    }
+
+    if (error)
+    {
+        g_warning ("Could not ask session manager to log out: %s", error->message);
+        g_error_free (error);
+    }
+}
 void
 system_log_out (GSimpleAction *action,
                 GVariant      *parameter,
                 gpointer       user_data)
 {
+    MenuSessionManager *manager = NULL;
+    MenuSessionManagerLogoutType  mode = MENU_SESSION_MANAGER_LOGOUT_MODE_NORMAL;
+    manager = menu_session_manager_get ();
+
+    if (!manager->priv->session_proxy)
+    {
+         g_warning ("Session manager service not available.");
+         return;
+    }
+
+    g_dbus_proxy_call (manager->priv->session_proxy,
+                       "Logout",
+                       g_variant_new ("(u)", mode),
+                       G_DBUS_CALL_FLAGS_NONE,
+                       -1,
+                       NULL,
+                       (GAsyncReadyCallback) logout_ready_callback,
+                       manager);
 }
 void
 system_lock_screen (GSimpleAction *action,
@@ -166,4 +210,59 @@ void set_system_lockdown (GtkBuilder *builder)
                            "visible",
                             G_BINDING_SYNC_CREATE|G_BINDING_INVERT_BOOLEAN);
 
+}
+
+static void
+menu_session_manager_dispose (GObject *object)
+{
+    MenuSessionManager *manager;
+
+    manager = MENU_SESSION_MANAGER (object);
+
+    g_object_unref (manager->priv->session_proxy);
+
+    G_OBJECT_CLASS (menu_session_manager_parent_class)->dispose (object);
+}
+static void
+menu_session_manager_class_init (MenuSessionManagerClass *klass)
+{
+    GObjectClass *gobject_class;
+
+    gobject_class = G_OBJECT_CLASS (klass);
+    gobject_class->dispose = menu_session_manager_dispose;
+}
+
+static void
+menu_session_manager_init (MenuSessionManager *manager)
+{
+    GError *error = NULL;
+
+    manager->priv = menu_session_manager_get_instance_private (manager);
+
+    manager->priv->session_proxy = g_dbus_proxy_new_for_bus_sync (
+                        G_BUS_TYPE_SESSION,
+                        G_DBUS_PROXY_FLAGS_NONE,
+                        NULL,
+                        "org.gnome.SessionManager",
+                        "/org/gnome/SessionManager",
+                        "org.gnome.SessionManager",
+                        NULL, &error);
+
+    if (error)
+    {
+        g_warning ("Could not connect to session manager: %s",
+               error->message);
+        g_error_free (error);
+    }
+}
+MenuSessionManager *
+menu_session_manager_get (void)
+{
+    static MenuSessionManager *manager = NULL;
+
+    if (manager == NULL)
+    {
+        manager = g_object_new (MENU_TYPE_SESSION_MANAGER, NULL);
+    }
+    return manager;
 }

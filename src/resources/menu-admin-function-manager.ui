@@ -383,7 +383,7 @@
                   <property name="visible">True</property>
                    <property name="valign">center</property>
                   <property name="icon-size">1</property>
-                  <property name="icon-name">gnome-session-hibernate</property>
+                  <property name="icon-name">gnome-panel-suspend</property>
                 </object>
               </child>
               <child>
