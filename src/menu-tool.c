@@ -213,12 +213,49 @@ system_lock_screen (GSimpleAction *action,
                        proxy);
 
 }
+static void
+reboot_ready_callback (GObject      *source_object,
+                       GAsyncResult *res,
+                       gpointer      user_data)
+{
+    GDBusProxy *proxy = G_DBUS_PROXY (user_data);
+    GError     *error = NULL;
+    GVariant   *ret;
 
+    ret = g_dbus_proxy_call_finish (proxy, res, &error);
+    if (ret)
+    {
+        g_variant_unref (ret);
+    }
+
+    if (error)
+    {
+        g_warning ("Could not ask session manager to reboot: %s", error->message);
+        g_error_free (error);
+    }
+}
 void
 system_reboot (GSimpleAction *action,
                GVariant      *parameter,
                gpointer       user_data)
 {
+    MenuSessionManager *manager = NULL;
+    manager = menu_session_manager_get ();
+
+    if (!manager->priv->session_proxy)
+    {
+        g_warning ("Session manager service not available.");
+        return;
+    }
+
+    g_dbus_proxy_call (manager->priv->session_proxy,
+                       "Reboot",
+                       NULL,
+                       G_DBUS_CALL_FLAGS_NONE,
+                       -1,
+                       NULL,
+                       (GAsyncReadyCallback) reboot_ready_callback,
+                       manager->priv->session_proxy);
 }
 void
 system_shutdown (GSimpleAction *action,
