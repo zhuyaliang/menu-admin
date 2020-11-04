@@ -12,6 +12,8 @@
 
 struct _MenuSessionManagerPrivate {
     GDBusProxy *session_proxy;
+    GDBusProxy *mate_screen;
+    GDBusProxy *gnome_screen;
 };
 
 G_DEFINE_TYPE (MenuSessionManager, menu_session_manager, G_TYPE_OBJECT);
@@ -159,6 +161,44 @@ system_lock_screen (GSimpleAction *action,
                     GVariant      *parameter,
                     gpointer       user_data)
 {
+    MenuSessionManager *manager = NULL;
+    GDBusProxy *proxy;
+    GError *error = NULL;
+    GVariant *ret;
+
+    manager = menu_session_manager_get ();
+
+    if (manager->priv->gnome_screen)
+    {
+        proxy = manager->priv->gnome_screen;
+    }
+    else if (manager->priv->mate_screen)
+    {
+        proxy = manager->priv->mate_screen;
+    }
+    else
+    {
+        g_warning ("Screensaver service not available.");
+        return;
+    }
+
+    ret = g_dbus_proxy_call_sync (proxy,
+                        "Lock",
+                        NULL,
+                        G_DBUS_CALL_FLAGS_NONE,
+                        -1,
+                        NULL,
+                        &error);
+
+    if (ret)
+        g_variant_unref (ret);
+
+    if (error)
+    {
+        g_warning ("Could not ask screensaver to lock: %s",
+            error->message);
+        g_error_free (error);
+    }
 }
 void
 system_suspend (GSimpleAction *action,
@@ -179,10 +219,49 @@ system_shutdown (GSimpleAction *action,
 {
 }
 
+static gboolean get_lock_screen_visible (void)
+{
+    GDBusProxy *proxy_gnome;
+    GDBusProxy *proxy_mate;
+    gboolean g = FALSE;
+    gboolean m = FALSE;
+
+    proxy_gnome = g_dbus_proxy_new_for_bus_sync (
+                        G_BUS_TYPE_SESSION,
+                        G_DBUS_PROXY_FLAGS_NONE,
+                        NULL,
+                        "org.gnome.ScreenSaver",
+                        "/org/gnome/ScreenSaver",
+                        "org.gnome.ScreenSaver",
+                        NULL, NULL);
+
+    proxy_mate = g_dbus_proxy_new_for_bus_sync (
+                        G_BUS_TYPE_SESSION,
+                        G_DBUS_PROXY_FLAGS_NONE,
+                        NULL,
+                        "org.gnome.ScreenSaver",
+                        "/org/gnome/ScreenSaver",
+                        "org.gnome.ScreenSaver",
+                        NULL, NULL);
+
+    if (proxy_mate != NULL)
+    {
+        g_object_unref (proxy_mate);
+        m = TRUE;
+    }
+    if (proxy_gnome != NULL)
+    {
+        g_object_unref (proxy_gnome);
+        g = TRUE;
+    }
+
+    return m | g;
+}
 void set_system_lockdown (GtkBuilder *builder)
 {
     GtkWidget    *widget;
     MenuLockdown *lockdown;
+    gboolean      enable;
 
     lockdown = menu_lockdown_get ();
 
@@ -210,6 +289,8 @@ void set_system_lockdown (GtkBuilder *builder)
                            "visible",
                             G_BINDING_SYNC_CREATE|G_BINDING_INVERT_BOOLEAN);
 
+    enable = get_lock_screen_visible ();
+    gtk_widget_set_visible (widget, enable);
 }
 
 static void
@@ -220,6 +301,8 @@ menu_session_manager_dispose (GObject *object)
     manager = MENU_SESSION_MANAGER (object);
 
     g_object_unref (manager->priv->session_proxy);
+    g_object_unref (manager->priv->gnome_screen);
+    g_object_unref (manager->priv->mate_screen);
 
     G_OBJECT_CLASS (menu_session_manager_parent_class)->dispose (object);
 }
@@ -254,6 +337,22 @@ menu_session_manager_init (MenuSessionManager *manager)
                error->message);
         g_error_free (error);
     }
+    manager->priv->gnome_screen = g_dbus_proxy_new_for_bus_sync (
+                        G_BUS_TYPE_SESSION,
+                        G_DBUS_PROXY_FLAGS_NONE,
+                        NULL,
+                        "org.gnome.ScreenSaver",
+                        "/org/gnome/ScreenSaver",
+                        "org.gnome.ScreenSaver",
+                        NULL, NULL);
+    manager->priv->mate_screen = g_dbus_proxy_new_for_bus_sync (
+                        G_BUS_TYPE_SESSION,
+                        G_DBUS_PROXY_FLAGS_NONE,
+                        NULL,
+                        "org.mate.ScreenSaver",
+                        "/",
+                        "org.mate.ScreenSaver",
+                        NULL, NULL);
 }
 MenuSessionManager *
 menu_session_manager_get (void)
