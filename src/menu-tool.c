@@ -73,7 +73,7 @@ system_switch_user (GSimpleAction *action,
     }
     if (type == GDM)
     {
-        gdm_goto_login_session_sync (NULL, NULL);
+        gdm_goto_login_session_sync (NULL, &error);
     }
     if (type == LIGHTDM)
     {
@@ -97,12 +97,11 @@ system_switch_user (GSimpleAction *action,
                                     NULL);
             g_object_unref (proxy);
         }
-        else
-        {
-            g_debug ("GsmManager: Unable to start LightDM greeter: %s", error->message);
-            g_error_free (error);
-        }
-
+    }
+    if (error != NULL)
+    {
+        g_debug ("Error switching user: %s", error->message);
+        g_error_free (error);
     }
 }
 void

@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: menu-admin\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-10-27 18:22+0800\n"
-"PO-Revision-Date: 2020-10-27 18:25+0800\n"
+"POT-Creation-Date: 2020-11-04 09:35+0800\n"
+"PO-Revision-Date: 2020-11-04 09:36+0800\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: none\n"
 "Language: zh_CN\n"
@@ -66,35 +66,35 @@ msgstr "菜单栏字体大小"
 msgid "Set the size of an font used in menu bar"
 msgstr "设置菜单栏中使用的字体大小"
 
-#: src/app-menu.c:274
+#: src/app-menu.c:273
 msgid "add app to desktop"
 msgstr "将应用程序添加到桌面"
 
-#: src/app-menu.c:276
+#: src/app-menu.c:275
 msgid "Problem while copying launcher to desktop"
 msgstr "将启动器复制到桌面时出现问题"
 
-#: src/app-menu.c:298
+#: src/app-menu.c:297
 msgid "Add this launcher to _panel"
 msgstr "将此启动器添加到面板"
 
-#: src/app-menu.c:302
+#: src/app-menu.c:301
 msgid "Add this launcher to _desktop"
 msgstr "将此启动器添加到桌面"
 
-#: src/app-menu.c:311
+#: src/app-menu.c:310
 msgid "Preferences"
 msgstr "属性"
 
-#: src/app-menu.c:322
+#: src/app-menu.c:321
 msgid "_Entire menu"
 msgstr "整个菜单"
 
-#: src/app-menu.c:327
+#: src/app-menu.c:326
 msgid "Add this as _drawer to panel"
 msgstr "将此作为抽屉添加到面板"
 
-#: src/app-menu.c:331
+#: src/app-menu.c:330
 msgid "Add this as _menu to panel"
 msgstr "将此作为菜单添加到面板"
 
@@ -107,92 +107,92 @@ msgstr "无法打开位置 '%s'"
 msgid "No application to handle search folders is installed."
 msgstr "未安装处理搜索文件夹的应用程序."
 
-#: src/menu-window.c:161
+#: src/menu-window.c:163
 msgid "Setting Menu"
 msgstr "设置菜单"
 
-#: src/menu-window.c:164
+#: src/menu-window.c:166
 msgid "Restore"
 msgstr "还原"
 
-#: src/menu-window.c:166 src/menu-window.c:340
+#: src/menu-window.c:168 src/menu-window.c:341
 msgid "Close"
 msgstr "关闭"
 
-#: src/menu-window.c:187
+#: src/menu-window.c:189
 msgid "Menu Font"
 msgstr "菜单字体"
 
-#: src/menu-window.c:194
+#: src/menu-window.c:196
 msgid "Menu Icon"
 msgstr "菜单图标"
 
 #. setting menu width
-#: src/menu-window.c:202
+#: src/menu-window.c:204
 msgid "Menu width"
 msgstr "菜单宽度"
 
 #. settings menu column
-#: src/menu-window.c:210
+#: src/menu-window.c:212
 msgid "Menu column"
 msgstr "菜单列"
 
 #. settings menu row
-#: src/menu-window.c:218
+#: src/menu-window.c:220
 msgid "Menu row"
 msgstr "菜单行"
 
-#: src/menu-window.c:248
+#: src/menu-window.c:249
 msgid "translator-credits"
 msgstr "翻译"
 
-#: src/menu-window.c:249
+#: src/menu-window.c:250
 msgid "applications menu admin"
 msgstr "应用程序菜单管理"
 
-#: src/menu-window.c:291 src/menu-window.c:301
+#: src/menu-window.c:292 src/menu-window.c:302
 #, c-format
 msgid "Could not open recently used document \"%s\""
 msgstr "无法打开最近使用的文档 \"%s\""
 
-#: src/menu-window.c:303
+#: src/menu-window.c:304
 #, c-format
 msgid "An unknown error occurred while trying to open \"%s\"."
 msgstr "尝试打开时发生未知错误\"%s\"."
 
-#: src/menu-window.c:338 src/resources/menu-admin-function-manager.ui:185
+#: src/menu-window.c:339 src/resources/menu-admin-function-manager.ui:185
 msgid "Recent Open"
 msgstr "最近打开"
 
-#: src/menu-window.c:341
+#: src/menu-window.c:342
 msgid "Open"
 msgstr "打开"
 
-#: src/menu-window.c:351
+#: src/menu-window.c:352
 msgid "All Files"
 msgstr "所有文件"
 
-#: src/menu-window.c:352
+#: src/menu-window.c:353
 msgid "PDF Files"
 msgstr "pdf 文件."
 
-#: src/menu-window.c:353
+#: src/menu-window.c:354
 msgid "Image Files"
 msgstr "图像文件"
 
-#: src/menu-window.c:354
+#: src/menu-window.c:355
 msgid "Text Files"
 msgstr "文本文件"
 
-#: src/menu-window.c:500
+#: src/menu-window.c:509
 msgid "Search for applications in the menu"
 msgstr "搜索菜单中的应用程序"
 
-#: src/menu-window.c:505
+#: src/menu-window.c:514
 msgid "Click to see more features"
 msgstr "点击查看更多功能"
 
-#: src/menu-window.c:509
+#: src/menu-window.c:518
 msgid "View current user information"
 msgstr "查看当前用户信息"
 
@@ -211,6 +211,38 @@ msgstr "网络"
 #: src/resources/menu-admin-function-manager.ui:147
 msgid "Computer"
 msgstr "计算机"
+
+#: src/resources/menu-admin-function-manager.ui:234
+msgid "User Info"
+msgstr "用户信息"
+
+#: src/resources/menu-admin-function-manager.ui:272
+msgid "System-settings"
+msgstr "系统设置"
+
+#: src/resources/menu-admin-function-manager.ui:310
+msgid "switch user"
+msgstr "切换用户"
+
+#: src/resources/menu-admin-function-manager.ui:338
+msgid "Log Out"
+msgstr "注销"
+
+#: src/resources/menu-admin-function-manager.ui:366
+msgid "lock screen"
+msgstr "锁屏"
+
+#: src/resources/menu-admin-function-manager.ui:394
+msgid "Suspend"
+msgstr "挂起"
+
+#: src/resources/menu-admin-function-manager.ui:422
+msgid "reboot"
+msgstr "重启"
+
+#: src/resources/menu-admin-function-manager.ui:450
+msgid "shutdown"
+msgstr "关机"
 
 #~ msgid "Confirm"
 #~ msgstr "确认"
