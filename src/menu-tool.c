@@ -213,12 +213,7 @@ system_lock_screen (GSimpleAction *action,
                        proxy);
 
 }
-void
-system_suspend (GSimpleAction *action,
-                GVariant      *parameter,
-                gpointer       user_data)
-{
-}
+
 void
 system_reboot (GSimpleAction *action,
                GVariant      *parameter,

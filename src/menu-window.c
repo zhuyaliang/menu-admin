@@ -411,7 +411,6 @@ static const GActionEntry actions[] = {
   { "system-switch-user",  system_switch_user},
   { "system-log-out",      system_log_out},
   { "system-lock-screen",  system_lock_screen},
-  { "system-suspend",      system_suspend},
   { "system-reboot",       system_reboot},
   { "system-shutdown",     system_shutdown},
 };

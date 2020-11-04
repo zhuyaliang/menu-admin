@@ -369,34 +369,6 @@
           </object>
         </child>
         <child>
-          <object class="GtkBox" id="suspend">
-            <property name="visible">True</property>
-            <property name="orientation">horizontal</property>
-            <property name="valign">center</property>
-            <property name="margin-start">12</property>
-            <property name="margin-end">12</property>
-            <property name="margin-top">6</property>
-            <property name="spacing">6</property>
-            <property name="margin-bottom">3</property>
-              <child>
-                <object class="GtkImage">
-                  <property name="visible">True</property>
-                   <property name="valign">center</property>
-                  <property name="icon-size">1</property>
-                  <property name="icon-name">gnome-panel-suspend</property>
-                </object>
-              </child>
-              <child>
-                 <object class="GtkModelButton">
-                   <property name="visible">True</property>
-                   <property name="valign">center</property>
-                   <property name="action-name">win.system-suspend</property>
-                   <property name="text" translatable="yes">Suspend</property>
-                 </object>
-              </child>
-          </object>
-        </child>
-        <child>
           <object class="GtkBox" id="reboot">
             <property name="visible">True</property>
             <property name="orientation">horizontal</property>
