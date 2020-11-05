@@ -504,17 +504,20 @@ static GtkWidget *create_manager_menu (MenuWindow *menuwin,GtkWidget *stack)
     separator = gtk_separator_new (GTK_ORIENTATION_HORIZONTAL);
     gtk_grid_attach(GTK_GRID(table) ,separator, 0, 0, 3, 1);
 
+    /*create search button*/
     search_button = set_button_style ("edit-find-symbolic");
     gtk_widget_set_tooltip_text (search_button,_("Search for applications in the menu"));
     gtk_button_set_relief (GTK_BUTTON(search_button),GTK_RELIEF_NONE);
     gtk_grid_attach(GTK_GRID(table), search_button, 0, 1, 1, 1);
 
+    /*create more function button*/
     menu_button = create_menu_button (menuwin, "popover", "open-menu-symbolic");
     gtk_widget_set_tooltip_text (menu_button,_("Click to see more features"));
     gtk_grid_attach(GTK_GRID(table), menu_button, 1, 1, 1, 1);
 
-    user_button = create_menu_button (menuwin, "popover-system", "system");
-    gtk_widget_set_tooltip_text (user_button,_("View current user information"));
+    /*create system session manager button*/
+    user_button = create_menu_button (menuwin, "popover-system", "emblem-system-symbolic");
+    gtk_widget_set_tooltip_text (user_button,_("Managing computer systems and sessions"));
     gtk_grid_attach(GTK_GRID(table), user_button, 2, 1, 1, 1);
 
     searchbar = create_search_bar (menuwin);
