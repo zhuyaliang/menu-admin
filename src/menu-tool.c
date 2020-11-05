@@ -49,6 +49,19 @@ static dm_type get_dm_type (void)
     else
         return ERROR;
 }
+static gboolean get_desktop_type (void)
+{
+    const char *desktop = g_getenv ("XDG_CURRENT_DESKTOP");
+
+    if (desktop == NULL)
+        return FALSE;
+
+    if (g_strcmp0 (desktop,"MATE") == 0)
+        return TRUE;
+    else
+        return FALSE;
+
+}
 void
 system_user_info (GSimpleAction *action,
                   GVariant      *parameter,
@@ -240,22 +253,40 @@ system_reboot (GSimpleAction *action,
                gpointer       user_data)
 {
     MenuSessionManager *manager = NULL;
+    gboolean mate_desktop;
+
     manager = menu_session_manager_get ();
+    mate_desktop = get_desktop_type ();
 
     if (!manager->priv->session_proxy)
     {
         g_warning ("Session manager service not available.");
         return;
     }
+    if (mate_desktop)
+    {
+        g_dbus_proxy_call (manager->priv->session_proxy,
+                           "Shutdown",
+                           NULL,
+                           G_DBUS_CALL_FLAGS_NONE,
+                           -1,
+                           NULL,
+                           (GAsyncReadyCallback) reboot_ready_callback,
+                           manager->priv->session_proxy);
 
-    g_dbus_proxy_call (manager->priv->session_proxy,
-                       "Reboot",
-                       NULL,
-                       G_DBUS_CALL_FLAGS_NONE,
-                       -1,
-                       NULL,
-                       (GAsyncReadyCallback) reboot_ready_callback,
-                       manager->priv->session_proxy);
+    }
+    else
+    {
+        g_dbus_proxy_call (manager->priv->session_proxy,
+                           "Reboot",
+                           NULL,
+                           G_DBUS_CALL_FLAGS_NONE,
+                           -1,
+                           NULL,
+                           (GAsyncReadyCallback) reboot_ready_callback,
+                           manager->priv->session_proxy);
+
+    }
 }
 static void
 shutdown_ready_callback (GObject      *source_object,
@@ -274,7 +305,7 @@ shutdown_ready_callback (GObject      *source_object,
 
     if (error)
     {
-        g_warning ("Could not ask session manager to reboot: %s", error->message);
+        g_warning ("Could not ask session manager to shutdown: %s", error->message);
         g_error_free (error);
     }
 }
