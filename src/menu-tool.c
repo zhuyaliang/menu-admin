@@ -1,10 +1,16 @@
 #include <glib.h>
+#include <glib/gi18n.h>
+#include <gio/gio.h>
+#include <gtk/gtk.h>
 #include <glib/gstdio.h>
 #include <fcntl.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <gdm/gdm-user-switching.h>
 #include <lightdm.h>
+#include <act/act-user-manager.h>
+#include <act/act-user.h>
+
 #include "menu-tool.h"
 #include "menu-lockdown.h"
 
@@ -62,11 +68,141 @@ static gboolean get_desktop_type (void)
         return FALSE;
 
 }
+static void users_loaded (ActUserManager  *manager,
+                          GParamSpec      *pspec,
+                          gpointer         user_data)
+{
+    GtkWidget  *content_area;
+    GtkWidget  *box;
+    ActUser    *user = NULL;
+    GtkWidget  *dialog = GTK_WIDGET (user_data);
+    const char *user_name;
+    const char *icon_name;
+    gint64      login_time;
+    const char *home_path;
+    const char *session_name;
+    GSList     *list = NULL,*l;
+    GdkPixbuf  *pb2;
+    g_autoptr(GdkPixbuf) pb1 = NULL;
+    GtkWidget  *image;
+    GtkWidget  *table;
+    GtkWidget  *label;
+    GtkWidget  *entry;
+    GDateTime  *time;
+    g_autofree gchar *mod_date = NULL;
+
+    content_area = gtk_dialog_get_content_area (GTK_DIALOG (dialog));
+    box = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 8);
+    gtk_container_set_border_width (GTK_CONTAINER (box), 8);
+    gtk_box_pack_start (GTK_BOX (content_area), box, FALSE, FALSE, 0);
+
+    user_name = g_get_user_name ();
+    list = act_user_manager_list_users (manager);
+    for (l = list; l; l = l->next)
+    {
+        user = l->data;
+        user_name = act_user_get_user_name (user);
+        if (g_strcmp0 (g_get_user_name (),act_user_get_user_name (user)) == 0)
+            break;
+    }
+    if (user == NULL)
+        return;
+    icon_name = act_user_get_icon_file (user);
+    pb1 = gdk_pixbuf_new_from_file(icon_name, NULL);
+    pb2 = gdk_pixbuf_scale_simple (pb1, 96, 96, GDK_INTERP_BILINEAR);
+    image = gtk_image_new_from_pixbuf(pb2);
+
+    gtk_box_pack_start (GTK_BOX (box), image, FALSE, FALSE, 0);
+
+    table = gtk_grid_new ();
+    gtk_grid_set_row_spacing (GTK_GRID (table), 8);
+    gtk_grid_set_column_spacing (GTK_GRID (table), 8);
+    gtk_box_pack_start (GTK_BOX (box), table, TRUE, TRUE, 12);
+
+    label = gtk_label_new_with_mnemonic (_("User name"));
+    gtk_grid_attach (GTK_GRID (table), label, 0, 0, 1, 1);
+    entry = gtk_entry_new ();
+    gtk_entry_set_text (GTK_ENTRY (entry), user_name);
+    gtk_widget_set_sensitive (entry, FALSE);
+    gtk_grid_attach (GTK_GRID (table), entry, 1, 0, 1, 1);
+    gtk_label_set_mnemonic_widget (GTK_LABEL (label), entry);
+
+    label = gtk_label_new_with_mnemonic (_("Home path"));
+    gtk_grid_attach (GTK_GRID (table), label, 0, 1, 1, 1);
+    entry = gtk_entry_new ();
+    gtk_widget_set_sensitive (entry, FALSE);
+    home_path = act_user_get_home_dir (user);
+    gtk_entry_set_text (GTK_ENTRY (entry), home_path);
+    gtk_grid_attach (GTK_GRID (table), entry, 1, 1, 1, 1);
+    gtk_label_set_mnemonic_widget (GTK_LABEL (label), entry);
+
+    label = gtk_label_new_with_mnemonic (_("Login time"));
+    gtk_grid_attach (GTK_GRID (table), label, 0, 2, 1, 1);
+    entry = gtk_entry_new ();
+    gtk_widget_set_sensitive (entry, FALSE);
+    login_time = act_user_get_login_time (user);
+    time = g_date_time_new_from_unix_local (login_time);
+    mod_date = g_date_time_format (time, "%Y %b %d %H:%M:%S");
+    gtk_entry_set_text (GTK_ENTRY (entry), mod_date);
+    gtk_grid_attach (GTK_GRID (table), entry, 1, 2, 1, 1);
+    gtk_label_set_mnemonic_widget (GTK_LABEL (label), entry);
+
+    label = gtk_label_new_with_mnemonic ("session name");
+    gtk_grid_attach (GTK_GRID (table), label, 0, 3, 1, 1);
+    entry = gtk_entry_new ();
+    gtk_widget_set_sensitive (entry, FALSE);
+    session_name = act_user_get_x_session (user);
+    gtk_entry_set_text (GTK_ENTRY (entry), session_name);
+    gtk_grid_attach (GTK_GRID (table), entry, 1, 3, 1, 1);
+    gtk_label_set_mnemonic_widget (GTK_LABEL (label), entry);
+
+    gtk_widget_show_all (dialog);
+}
+
+static void
+user_info_cb (GtkDialog *dialog,
+              gint       response_id,
+              gpointer   user_data)
+{
+    gtk_widget_destroy (GTK_WIDGET (dialog));
+}
 void
 system_user_info (GSimpleAction *action,
                   GVariant      *parameter,
                   gpointer       user_data)
 {
+    GtkWidget  *dialog;
+    gboolean    loaded;
+    GtkWindow  *parent = GTK_WINDOW (user_data);
+    ActUserManager *manager;
+
+    dialog = gtk_dialog_new_with_buttons (_("User Info"),
+                                          parent,
+                                          GTK_DIALOG_MODAL| GTK_DIALOG_DESTROY_WITH_PARENT,
+                                          _("_OK"),
+                                          GTK_RESPONSE_OK,
+                                          _("_Cancel"),
+                                          GTK_RESPONSE_CANCEL,
+                                          NULL);
+
+    g_signal_connect (dialog,
+                     "response",
+                      G_CALLBACK (user_info_cb),
+                      NULL);
+    gtk_container_set_border_width(GTK_CONTAINER (dialog), 20);
+    gtk_window_set_deletable(GTK_WINDOW (dialog), FALSE);
+    gtk_window_set_default_size (GTK_WINDOW (dialog), 450, 200);
+
+    manager = act_user_manager_get_default ();
+    g_object_get (manager, "is-loaded", &loaded, NULL);
+    if (loaded)
+        users_loaded (manager, NULL, dialog);
+    else
+        g_signal_connect(manager,
+                        "notify::is-loaded",
+                         G_CALLBACK (users_loaded),
+                         dialog);
+
 }
 void
 system_settings (GSimpleAction *action,

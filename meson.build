@@ -93,6 +93,8 @@ md_deps = dependency('libmate-menu')
 gdm_deps = dependency('gdm')
 lightdm_deps = dependency('liblightdm-gobject-1')
 polkit_deps = dependency('polkit-gobject-1')
+act_deps = dependency('accountsservice')
+
 # Configure data
 conf = configuration_data()
 conf.set_quoted('VERSION', meson.project_version())
