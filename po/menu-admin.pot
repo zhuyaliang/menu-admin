@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: menu-admin\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-11-04 09:35+0800\n"
+"POT-Creation-Date: 2020-11-09 17:04+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -106,6 +106,34 @@ msgstr ""
 msgid "No application to handle search folders is installed."
 msgstr ""
 
+#: src/menu-tool.c:122
+msgid "User name"
+msgstr ""
+
+#: src/menu-tool.c:130
+msgid "Home path"
+msgstr ""
+
+#: src/menu-tool.c:139
+msgid "Login time"
+msgstr ""
+
+#: src/menu-tool.c:150
+msgid "Session name"
+msgstr ""
+
+#: src/menu-tool.c:179 src/resources/menu-admin-function-manager.ui:234
+msgid "User Info"
+msgstr ""
+
+#: src/menu-tool.c:182
+msgid "_OK"
+msgstr ""
+
+#: src/menu-tool.c:184
+msgid "_Cancel"
+msgstr ""
+
 #: src/menu-window.c:163
 msgid "Setting Menu"
 msgstr ""
@@ -187,12 +215,12 @@ msgstr ""
 msgid "Search for applications in the menu"
 msgstr ""
 
-#: src/menu-window.c:514
+#: src/menu-window.c:515
 msgid "Click to see more features"
 msgstr ""
 
-#: src/menu-window.c:518
-msgid "View current user information"
+#: src/menu-window.c:520
+msgid "Managing computer systems and sessions"
 msgstr ""
 
 #: src/resources/menu-admin-function-manager.ui:32
@@ -209,10 +237,6 @@ msgstr ""
 
 #: src/resources/menu-admin-function-manager.ui:147
 msgid "Computer"
-msgstr ""
-
-#: src/resources/menu-admin-function-manager.ui:234
-msgid "User Info"
 msgstr ""
 
 #: src/resources/menu-admin-function-manager.ui:272
@@ -232,13 +256,9 @@ msgid "lock screen"
 msgstr ""
 
 #: src/resources/menu-admin-function-manager.ui:394
-msgid "Suspend"
-msgstr ""
-
-#: src/resources/menu-admin-function-manager.ui:422
 msgid "reboot"
 msgstr ""
 
-#: src/resources/menu-admin-function-manager.ui:450
+#: src/resources/menu-admin-function-manager.ui:422
 msgid "shutdown"
 msgstr ""

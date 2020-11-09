@@ -2,5 +2,7 @@ data/org.menuadmin.gschema.xml.in
 src/app-menu.c  
 src/app-util.c  
 src/main.c  
+src/menu-tool.c
+src/menu-lockdown.c
 src/menu-window.c
 src/resources/menu-admin-function-manager.ui

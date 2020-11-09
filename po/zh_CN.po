@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: menu-admin\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-11-04 09:35+0800\n"
-"PO-Revision-Date: 2020-11-04 09:36+0800\n"
+"POT-Creation-Date: 2020-11-09 17:04+0800\n"
+"PO-Revision-Date: 2020-11-09 17:04+0800\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: none\n"
 "Language: zh_CN\n"
@@ -107,6 +107,34 @@ msgstr "无法打开位置 '%s'"
 msgid "No application to handle search folders is installed."
 msgstr "未安装处理搜索文件夹的应用程序."
 
+#: src/menu-tool.c:122
+msgid "User name"
+msgstr "用户名字"
+
+#: src/menu-tool.c:130
+msgid "Home path"
+msgstr "家目录"
+
+#: src/menu-tool.c:139
+msgid "Login time"
+msgstr "登录时间"
+
+#: src/menu-tool.c:150
+msgid "Session name"
+msgstr "会话"
+
+#: src/menu-tool.c:179 src/resources/menu-admin-function-manager.ui:234
+msgid "User Info"
+msgstr "用户信息"
+
+#: src/menu-tool.c:182
+msgid "_OK"
+msgstr "OK"
+
+#: src/menu-tool.c:184
+msgid "_Cancel"
+msgstr "取消"
+
 #: src/menu-window.c:163
 msgid "Setting Menu"
 msgstr "设置菜单"
@@ -174,7 +202,7 @@ msgstr "所有文件"
 
 #: src/menu-window.c:353
 msgid "PDF Files"
-msgstr "pdf 文件."
+msgstr "pdf 文件"
 
 #: src/menu-window.c:354
 msgid "Image Files"
@@ -188,13 +216,13 @@ msgstr "文本文件"
 msgid "Search for applications in the menu"
 msgstr "搜索菜单中的应用程序"
 
-#: src/menu-window.c:514
+#: src/menu-window.c:515
 msgid "Click to see more features"
 msgstr "点击查看更多功能"
 
-#: src/menu-window.c:518
-msgid "View current user information"
-msgstr "查看当前用户信息"
+#: src/menu-window.c:520
+msgid "Managing computer systems and sessions"
+msgstr "管理计算机系统和会话"
 
 #: src/resources/menu-admin-function-manager.ui:32
 msgid "About"
@@ -211,10 +239,6 @@ msgstr "网络"
 #: src/resources/menu-admin-function-manager.ui:147
 msgid "Computer"
 msgstr "计算机"
-
-#: src/resources/menu-admin-function-manager.ui:234
-msgid "User Info"
-msgstr "用户信息"
 
 #: src/resources/menu-admin-function-manager.ui:272
 msgid "System-settings"
@@ -233,16 +257,18 @@ msgid "lock screen"
 msgstr "锁屏"
 
 #: src/resources/menu-admin-function-manager.ui:394
-msgid "Suspend"
-msgstr "挂起"
-
-#: src/resources/menu-admin-function-manager.ui:422
 msgid "reboot"
 msgstr "重启"
 
-#: src/resources/menu-admin-function-manager.ui:450
+#: src/resources/menu-admin-function-manager.ui:422
 msgid "shutdown"
 msgstr "关机"
+
+#~ msgid "View current user information"
+#~ msgstr "查看当前用户信息"
+
+#~ msgid "Suspend"
+#~ msgstr "挂起"
 
 #~ msgid "Confirm"
 #~ msgstr "确认"

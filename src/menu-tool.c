@@ -147,7 +147,7 @@ static void users_loaded (ActUserManager  *manager,
     gtk_grid_attach (GTK_GRID (table), entry, 1, 2, 1, 1);
     gtk_label_set_mnemonic_widget (GTK_LABEL (label), entry);
 
-    label = gtk_label_new_with_mnemonic ("session name");
+    label = gtk_label_new_with_mnemonic (_("Session name"));
     gtk_grid_attach (GTK_GRID (table), label, 0, 3, 1, 1);
     entry = gtk_entry_new ();
     gtk_widget_set_sensitive (entry, FALSE);
