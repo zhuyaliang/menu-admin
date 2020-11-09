@@ -198,22 +198,18 @@ system_lock_screen (GSimpleAction *action,
                     gpointer       user_data)
 {
     MenuSessionManager *manager = NULL;
+    gboolean desktop_type;
     GDBusProxy *proxy;
 
     manager = menu_session_manager_get ();
-
-    if (manager->priv->gnome_screen)
-    {
-        proxy = manager->priv->gnome_screen;
-    }
-    else if (manager->priv->mate_screen)
+    desktop_type = get_desktop_type ();
+    if (desktop_type)
     {
         proxy = manager->priv->mate_screen;
     }
     else
     {
-        g_warning ("Screensaver service not available.");
-        return;
+        proxy = manager->priv->gnome_screen;
     }
 
     g_dbus_proxy_call (proxy,
