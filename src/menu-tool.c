@@ -12,9 +12,12 @@
 #include <act/act-user.h>
 
 #include "menu-tool.h"
+#include "app-util.h"
 #include "menu-lockdown.h"
 
-#define  DMFILE    "/etc/systemd/system/display-manager.service"
+#define  DMFILE        "/etc/systemd/system/display-manager.service"
+#define  MATE_DESKTOP  "/usr/share/applications/matecc.desktop"
+#define  GNOME_DESKTOP "/usr/share/applications/gnome-control-center.desktop"
 
 struct _MenuSessionManagerPrivate {
     GDBusProxy *session_proxy;
@@ -209,6 +212,16 @@ system_settings (GSimpleAction *action,
                  GVariant      *parameter,
                  gpointer       user_data)
 {
+    GtkWindow  *window = GTK_WINDOW (user_data);
+    GdkScreen  *screen;
+    gboolean    type;
+
+    screen = gtk_window_get_screen (window);
+    type = get_desktop_type ();
+    if (type)
+        app_launch_desktop_file (MATE_DESKTOP, screen, NULL);
+    else
+        app_launch_desktop_file (GNOME_DESKTOP, screen, NULL);
 }
 void
 system_switch_user (GSimpleAction *action,

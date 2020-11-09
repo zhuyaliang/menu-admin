@@ -473,3 +473,87 @@ menu_desktop_file_copy (const char  *source_path,
 
     return res;
 }
+
+static char *
+_lookup_in_applications_subdir (const char *basename,
+                const char *dir)
+{
+    char *path;
+
+    path = g_build_filename (dir, "applications", basename, NULL);
+    if (!g_file_test (path, G_FILE_TEST_EXISTS)) {
+        g_free (path);
+        return NULL;
+    }
+
+    return path;
+}
+
+static char *
+_app_g_lookup_in_data_dirs_internal (const char *basename,
+                       LookupInDir lookup)
+{
+    const char * const *system_data_dirs;
+    const char          *user_data_dir;
+    char                *retval;
+    int                  i;
+
+    user_data_dir    = g_get_user_data_dir ();
+    system_data_dirs = g_get_system_data_dirs ();
+
+    if ((retval = lookup (basename, user_data_dir)))
+        return retval;
+
+    for (i = 0; system_data_dirs[i]; i++)
+        if ((retval = lookup (basename, system_data_dirs[i])))
+            return retval;
+
+    return NULL;
+}
+static char *
+app_g_lookup_in_applications_dirs (const char *basename)
+{
+    return _app_g_lookup_in_data_dirs_internal (basename,
+                              _lookup_in_applications_subdir);
+}
+
+gboolean
+app_launch_desktop_file (const char  *desktop_file,
+                         GdkScreen   *screen,
+                         GError     **error)
+{
+    GDesktopAppInfo *appinfo;
+    gboolean         retval;
+
+    g_return_val_if_fail (desktop_file != NULL, FALSE);
+    g_return_val_if_fail (GDK_IS_SCREEN (screen), FALSE);
+    g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
+
+    appinfo = NULL;
+
+    if (g_path_is_absolute (desktop_file))
+        appinfo = g_desktop_app_info_new_from_filename (desktop_file);
+    else
+    {
+        char *full;
+
+        full = app_g_lookup_in_applications_dirs (desktop_file);
+        if (full)
+        {
+            appinfo = g_desktop_app_info_new_from_filename (full);
+            g_free (full);
+        }
+    }
+
+    if (appinfo == NULL)
+        return FALSE;
+
+    retval = menu_app_info_launch_uris (appinfo, NULL, screen, NULL,
+                         gtk_get_current_event_time (),
+                         error);
+
+    g_object_unref (appinfo);
+
+    return retval;
+}
+

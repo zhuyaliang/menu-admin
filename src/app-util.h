@@ -49,6 +49,10 @@ gboolean   menu_show_fm_search_uri          (const gchar  *fm,
                                              guint32       timestamp,
                                              GError      **error);
 
+gboolean   app_launch_desktop_file          (const char   *desktop_file,
+                                             GdkScreen    *screen,
+                                             GError      **error);
+
 char      *menu_get_desktop_path_from_name  (const char   *dir,
                                              const char   *source);
 
