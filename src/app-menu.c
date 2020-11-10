@@ -55,7 +55,7 @@ typedef enum
     ELLIPSIZE_END
 } EllipsizeMode;
 
-static char *font_size [] = {"xx-small","x-small","small","medium","large","x-large","xx-large"};
+static const char *font_size [] = {"xx-small","x-small","small","medium","large","x-large","xx-large"};
 static guint signals[LAST_SIGNAL] = { 0 };
 
 static void submenu_to_display (AppMenu *menu);
@@ -558,7 +558,7 @@ static void get_menu_entry_hash(MateMenuTreeDirectory *directory,
                 item = matemenu_tree_iter_get_entry (iter);
                 ginfo = matemenu_tree_entry_get_app_info (item);
                 name = g_app_info_get_name(G_APP_INFO(ginfo));
-                g_hash_table_insert (hash, name, item);
+                g_hash_table_insert (hash, (gpointer)name, item);
                 matemenu_tree_item_unref (item);
                 break;
             default:
