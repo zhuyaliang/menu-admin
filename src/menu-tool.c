@@ -21,8 +21,7 @@
 
 struct _MenuSessionManagerPrivate {
     GDBusProxy *session_proxy;
-    GDBusProxy *mate_screen;
-    GDBusProxy *gnome_screen;
+    GDBusProxy *screen;
 };
 
 G_DEFINE_TYPE (MenuSessionManager, menu_session_manager, G_TYPE_OBJECT);
@@ -347,20 +346,10 @@ system_lock_screen (GSimpleAction *action,
                     gpointer       user_data)
 {
     MenuSessionManager *manager = NULL;
-    gboolean desktop_type;
     GDBusProxy *proxy;
 
     manager = menu_session_manager_get ();
-    desktop_type = get_desktop_type ();
-    if (desktop_type)
-    {
-        proxy = manager->priv->mate_screen;
-    }
-    else
-    {
-        proxy = manager->priv->gnome_screen;
-    }
-
+    proxy = manager->priv->screen;
     g_dbus_proxy_call (proxy,
                       "Lock",
                        NULL,
@@ -560,8 +549,7 @@ menu_session_manager_dispose (GObject *object)
     manager = MENU_SESSION_MANAGER (object);
 
     g_object_unref (manager->priv->session_proxy);
-    g_object_unref (manager->priv->gnome_screen);
-    g_object_unref (manager->priv->mate_screen);
+    g_object_unref (manager->priv->screen);
 
     G_OBJECT_CLASS (menu_session_manager_parent_class)->dispose (object);
 }
@@ -577,7 +565,8 @@ menu_session_manager_class_init (MenuSessionManagerClass *klass)
 static void
 menu_session_manager_init (MenuSessionManager *manager)
 {
-    GError *error = NULL;
+    GError  *error = NULL;
+    gboolean desktop_type;
 
     manager->priv = menu_session_manager_get_instance_private (manager);
 
@@ -596,7 +585,23 @@ menu_session_manager_init (MenuSessionManager *manager)
                error->message);
         g_error_free (error);
     }
-    manager->priv->gnome_screen = g_dbus_proxy_new_for_bus_sync (
+
+    desktop_type = get_desktop_type ();
+    if (desktop_type)
+    {
+        manager->priv->screen = g_dbus_proxy_new_for_bus_sync (
+                            G_BUS_TYPE_SESSION,
+                            G_DBUS_PROXY_FLAGS_NONE,
+                            NULL,
+                            "org.mate.ScreenSaver",
+                            "/",
+                            "org.mate.ScreenSaver",
+                            NULL, NULL);
+
+    }
+    else
+    {
+        manager->priv->screen = g_dbus_proxy_new_for_bus_sync (
                         G_BUS_TYPE_SESSION,
                         G_DBUS_PROXY_FLAGS_NONE,
                         NULL,
@@ -604,15 +609,9 @@ menu_session_manager_init (MenuSessionManager *manager)
                         "/org/gnome/ScreenSaver",
                         "org.gnome.ScreenSaver",
                         NULL, NULL);
-    manager->priv->mate_screen = g_dbus_proxy_new_for_bus_sync (
-                        G_BUS_TYPE_SESSION,
-                        G_DBUS_PROXY_FLAGS_NONE,
-                        NULL,
-                        "org.mate.ScreenSaver",
-                        "/",
-                        "org.mate.ScreenSaver",
-                        NULL, NULL);
+    }
 }
+
 MenuSessionManager *
 menu_session_manager_get (void)
 {
