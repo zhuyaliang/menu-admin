@@ -92,8 +92,10 @@ gtk_deps = dependency('gtk+-3.0', version: gtk_req_version)
 if get_option('mate')
   have_mate = true
   menu_deps = dependency('libmate-menu')
+  
 else
   have_mate = false
+  run_command('./replace.sh','echo suss')
   menu_deps = dependency('libgnome-menu-3.0')
 endif
 
