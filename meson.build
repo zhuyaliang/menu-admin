@@ -94,6 +94,7 @@ gdm_deps = dependency('gdm')
 lightdm_deps = dependency('liblightdm-gobject-1')
 polkit_deps = dependency('polkit-gobject-1')
 act_deps = dependency('accountsservice')
+xml_deps = dependency('libxml-2.0')
 
 # Configure data
 conf = configuration_data()
