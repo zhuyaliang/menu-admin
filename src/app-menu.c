@@ -481,10 +481,9 @@ create_menuitem (AppMenu               *menu,
 
 static AppMenu *
 populate_menu_from_directory (AppMenu               *menu,
-                              MateMenuTreeDirectory *directory)
+                              MateMenuTreeDirectory *directory,
+                              gboolean               is_menu_show)
 {
-    //GList    *children;
-    //gboolean  add_separator;
     MateMenuTreeIter *iter;
     MateMenuTreeItemType type;
 
@@ -497,6 +496,11 @@ populate_menu_from_directory (AppMenu               *menu,
         {
             case MATEMENU_TREE_ITEM_DIRECTORY:
                 item = matemenu_tree_iter_get_directory(iter);
+                if (is_menu_show)
+                {
+                    populate_menu_from_directory (menu, item, is_menu_show);
+                    break;
+                }
                 create_submenu (menu, item, NULL);
                 matemenu_tree_item_unref (item);
                 break;
@@ -597,7 +601,7 @@ submenu_to_display (AppMenu *menu)
     }
     if (directory)
     {
-        populate_menu_from_directory (menu, directory);
+        populate_menu_from_directory (menu, directory, FALSE);
         get_menu_entry_hash (directory,menu->app_hash);
     }
 }
@@ -952,7 +956,7 @@ static void gsettings_row_spacing_changed (GSettings *settings,
 }
 static void show_submenu (AppMenu *menu,MateMenuTreeDirectory *directory,gpointer data)
 {
-    populate_menu_from_directory (menu,directory);
+    populate_menu_from_directory (menu, directory, TRUE);
 }
 AppMenu *app_menu_new (void)
 {
