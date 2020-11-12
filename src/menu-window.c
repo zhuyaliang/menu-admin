@@ -554,9 +554,9 @@ static GtkWidget *create_menu_box_page (MenuWindow *menuwin)
                                     GTK_POLICY_AUTOMATIC);
     gtk_box_pack_start (GTK_BOX (app_vbox), scroll, TRUE, TRUE, 0);
     gtk_widget_show_all (vbox);
-    menuwin->priv->menu = create_applications_menu ("mate-applications.menu",
-                                                     GTK_CONTAINER(scroll),
-                                                     GTK_BOX(category_box));
+    menuwin->priv->menu = create_applications_menu (APP_MENU,
+                                                    GTK_CONTAINER(scroll),
+                                                    GTK_BOX(category_box));
     return vbox;
 }
 

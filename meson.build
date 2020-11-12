@@ -112,6 +112,11 @@ conf = configuration_data()
 
 conf.set('MATE_DESKTOP', have_mate)
 conf.set('HAVE_LIGHTDM', have_lightdm)
+if (have_mate)
+  conf.set_quoted('APP_MENU', 'mate-applications.menu')
+else
+  conf.set_quoted('APP_MENU', 'gnome-applications.menu')
+endif
 conf.set_quoted('VERSION', meson.project_version())
 conf.set_quoted('PACKAGE_NAME', meson.project_name())
 conf.set_quoted('PACKAGE_URL','https://github.com/zhuyaliang/menu-admin')
