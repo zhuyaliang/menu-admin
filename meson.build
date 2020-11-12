@@ -99,13 +99,7 @@ else
   menu_deps = dependency('libgnome-menu-3.0')
 endif
 
-if get_option('gdm')
-  have_lightdm = false
-  dm_deps = dependency('gdm')
-else
-  have_lightdm = true
-  dm_deps = dependency('liblightdm-gobject-1')
-endif
+dm_deps = dependency('gdm')
 act_deps = dependency('accountsservice')
 xml_deps = dependency('libxml-2.0')
 
@@ -113,7 +107,6 @@ xml_deps = dependency('libxml-2.0')
 conf = configuration_data()
 
 conf.set('MATE_DESKTOP', have_mate)
-conf.set('HAVE_LIGHTDM', have_lightdm)
 if (have_mate)
   conf.set_quoted('APP_MENU', 'mate-applications.menu')
 else
