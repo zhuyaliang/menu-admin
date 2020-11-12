@@ -674,8 +674,6 @@ menu_window_init (MenuWindow *menuwin)
     gtk_window_set_position (window,GTK_WIN_POS_MOUSE);
     gtk_window_set_decorated (window, FALSE);
     gtk_window_set_resizable (window, FALSE);
-    gtk_window_stick (window);
-    gtk_window_set_keep_above (window,TRUE);
     gtk_window_set_default_size (GTK_WINDOW (window),
                                  200, 200);
 }
