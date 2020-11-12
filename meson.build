@@ -89,15 +89,29 @@ add_global_link_arguments(
 # Dependencies
 gtk_req_version = '>= 3.0.0'
 gtk_deps = dependency('gtk+-3.0', version: gtk_req_version)
-md_deps = dependency('libmate-menu')
-gdm_deps = dependency('gdm')
-lightdm_deps = dependency('liblightdm-gobject-1')
-polkit_deps = dependency('polkit-gobject-1')
+if get_option('mate')
+  have_mate = true
+  menu_deps = dependency('libmate-menu')
+else
+  have_mate = false
+  menu_deps = dependency('libgnome-menu-3.0')
+endif
+
+if get_option('gdm')
+  have_lightdm = false
+  dm_deps = dependency('gdm')
+else
+  have_lightdm = true
+  dm_deps = dependency('liblightdm-gobject-1')
+endif
 act_deps = dependency('accountsservice')
 xml_deps = dependency('libxml-2.0')
 
 # Configure data
 conf = configuration_data()
+
+conf.set('MATE_DESKTOP', have_mate)
+conf.set('HAVE_LIGHTDM', have_lightdm)
 conf.set_quoted('VERSION', meson.project_version())
 conf.set_quoted('PACKAGE_NAME', meson.project_name())
 conf.set_quoted('PACKAGE_URL','https://github.com/zhuyaliang/menu-admin')

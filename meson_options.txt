@@ -1,0 +1,11 @@
+option('gdm',
+  type: 'boolean',
+  value: true,
+  description: 'Enable gdm'
+)
+
+option('mate',
+  type: 'boolean',
+  value: true,
+  description: 'Enable Mate Menus'
+)

@@ -7,7 +7,6 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <gdm/gdm-user-switching.h>
-#include <lightdm.h>
 #include <act/act-user-manager.h>
 #include <act/act-user.h>
 
