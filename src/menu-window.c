@@ -455,9 +455,24 @@ search_changed_cb (GtkSearchEntry *entry,
     if (view_search_app_results (menuwin->priv->menu,text) != 0 )
         gtk_stack_set_visible_child_name (GTK_STACK (menuwin->priv->stack),"search-page");
 }
+
+static void
+set_visible_child (GtkToggleButton *button, gpointer data)
+{
+    MenuWindow *menuwin = MENU_WINDOW (data);
+    gboolean active;
+
+    active = gtk_toggle_button_get_active (button);
+    if (!active)
+    {
+        gtk_stack_set_visible_child_name (GTK_STACK (menuwin->priv->stack),"menu-page");
+    }
+}
+
 static GtkWidget *create_search_bar (MenuWindow *menuwin)
 {
     GtkWidget *entry;
+    GtkWidget *button;
     GtkWidget *container;
     GtkWidget *searchbar;
 
@@ -465,6 +480,17 @@ static GtkWidget *create_search_bar (MenuWindow *menuwin)
     container = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 10);
     gtk_widget_set_halign (container, GTK_ALIGN_CENTER);
     gtk_box_pack_start (GTK_BOX (container), entry, FALSE, FALSE, 0);
+
+    button = set_button_style ("go-home-symbolic");
+    gtk_widget_set_tooltip_text (button,_("End search and return to application menu"));
+    gtk_button_set_relief (GTK_BUTTON(button),GTK_RELIEF_NONE);
+    gtk_box_pack_start (GTK_BOX (container), button, FALSE, FALSE, 12);
+    g_signal_connect (button,
+                      "toggled",
+                      (GCallback)set_visible_child,
+                      menuwin);
+
+    gtk_widget_show (button);
 
     searchbar = gtk_search_bar_new ();
     gtk_search_bar_connect_entry (GTK_SEARCH_BAR (searchbar), GTK_ENTRY (entry));
@@ -476,18 +502,6 @@ static GtkWidget *create_search_bar (MenuWindow *menuwin)
                       menuwin);
     return searchbar;
 }
-static void
-set_visible_child (GtkToggleButton *button, gpointer data)
-{
-    gboolean active;
-
-    active = gtk_toggle_button_get_active (button);
-    if (!active)
-    {
-        gtk_stack_set_visible_child_name (GTK_STACK (data),"menu-page");
-    }
-}
-
 static void
 show_application_ready_callback (GObject      *source_object,
                                  GAsyncResult *res,
@@ -576,7 +590,6 @@ static GtkWidget *create_manager_menu (MenuWindow *menuwin,GtkWidget *stack)
     searchbar = create_search_bar (menuwin);
     gtk_grid_attach(GTK_GRID(table), searchbar, 0, 2, 4, 1);
 
-    g_signal_connect (search_button, "toggled", (GCallback) set_visible_child,stack);
     g_object_bind_property (search_button,
                            "active",
                             searchbar,
