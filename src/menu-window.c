@@ -773,3 +773,18 @@ menu_window_new (void)
     return GTK_WIDGET (menuwin);
 }
 
+gboolean
+window_key_press_event_cb (GtkWidget   *window,
+                           GdkEventKey *event,
+                           gpointer     data)
+{
+    MenuWindow *menuwin = MENU_WINDOW (window);
+
+    if (event->keyval == GDK_KEY_Escape)
+    {
+        gtk_stack_set_visible_child_name (GTK_STACK (menuwin->priv->stack),"menu-page");
+        gtk_stack_set_visible_child_name (GTK_STACK (menuwin->priv->opt_stack),"manager-page");
+        return GDK_EVENT_STOP;
+    }
+    return GDK_EVENT_PROPAGATE;
+}

@@ -26,4 +26,8 @@ GType         menu_window_get_type         (void) G_GNUC_CONST;
 
 GtkWidget    *menu_window_new              (void);
 
+gboolean      window_key_press_event_cb    (GtkWidget   *window,
+                                            GdkEventKey *event,
+                                            gpointer     data);
+
 #endif

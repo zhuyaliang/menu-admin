@@ -5,6 +5,7 @@
 
 #define GETTEXT_PACKAGE "menu-admin"
 #define LUNAR_CALENDAR_LOCALEDIR "/usr/share/locale"
+
 int main(int argc,char *argv[])
 {
     GtkWidget *window;
@@ -13,6 +14,10 @@ int main(int argc,char *argv[])
 
     gtk_init (&argc,&argv);
     window = menu_window_new ();
+    g_signal_connect (window,
+                     "key-press-event",
+                      G_CALLBACK (window_key_press_event_cb),
+                      NULL);
     gtk_widget_show (window);
     gtk_main();
 
