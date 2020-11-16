@@ -14,6 +14,7 @@ struct _MenuWindowPrivate
 {
     AppMenu    *menu;
     GtkWidget  *stack;
+    GtkWidget  *opt_stack;
     GSettings  *settings;
     GtkBuilder *builder;
     GDBusProxy *proxy;
@@ -456,17 +457,15 @@ search_changed_cb (GtkSearchEntry *entry,
         gtk_stack_set_visible_child_name (GTK_STACK (menuwin->priv->stack),"search-page");
 }
 
-static void
-set_visible_child (GtkToggleButton *button, gpointer data)
+static void swicth_stack_to_home (GtkWidget *button, gpointer user_data)
 {
-    MenuWindow *menuwin = MENU_WINDOW (data);
-    gboolean active;
+    MenuWindow *menuwin = MENU_WINDOW (user_data);
+    GtkWidget  *entry;
 
-    active = gtk_toggle_button_get_active (button);
-    if (!active)
-    {
-        gtk_stack_set_visible_child_name (GTK_STACK (menuwin->priv->stack),"menu-page");
-    }
+    entry = g_object_get_data (G_OBJECT (button), "search-entry");
+    gtk_entry_set_text (GTK_ENTRY (entry), "");
+    gtk_stack_set_visible_child_name (GTK_STACK (menuwin->priv->stack),"menu-page");
+    gtk_stack_set_visible_child_name (GTK_STACK (menuwin->priv->opt_stack),"manager-page");
 }
 
 static GtkWidget *create_search_bar (MenuWindow *menuwin)
@@ -485,15 +484,17 @@ static GtkWidget *create_search_bar (MenuWindow *menuwin)
     gtk_widget_set_tooltip_text (button,_("End search and return to application menu"));
     gtk_button_set_relief (GTK_BUTTON(button),GTK_RELIEF_NONE);
     gtk_box_pack_start (GTK_BOX (container), button, FALSE, FALSE, 12);
+    g_object_set_data (G_OBJECT (button), "search-entry", entry);
     g_signal_connect (button,
-                      "toggled",
-                      (GCallback)set_visible_child,
+                     "clicked",
+                     (GCallback)swicth_stack_to_home,
                       menuwin);
 
     gtk_widget_show (button);
 
     searchbar = gtk_search_bar_new ();
     gtk_search_bar_connect_entry (GTK_SEARCH_BAR (searchbar), GTK_ENTRY (entry));
+    gtk_search_bar_set_search_mode (GTK_SEARCH_BAR (searchbar), TRUE);
     gtk_search_bar_set_show_close_button (GTK_SEARCH_BAR (searchbar), FALSE);
     gtk_container_add (GTK_CONTAINER (searchbar), container);
     g_signal_connect (entry,
@@ -543,14 +544,20 @@ static void max_show_application (GtkWidget *button, gpointer user_data)
                        menuwin->priv->proxy);
 
 }
-static GtkWidget *create_manager_menu (MenuWindow *menuwin,GtkWidget *stack)
+
+static void swicth_stack_to_entry (GtkWidget *button, gpointer user_data)
+{
+    MenuWindow *menuwin = MENU_WINDOW (user_data);
+
+    gtk_stack_set_visible_child_name (GTK_STACK (menuwin->priv->opt_stack),"find-page");
+}
+static GtkWidget *create_manager_menu (MenuWindow *menuwin)
 {
     GtkWidget *table;
     GtkWidget *search_button;
     GtkWidget *menu_button;
     GtkWidget *user_button;
     GtkWidget *show_button;
-    GtkWidget *searchbar;
     GtkWidget *separator;
 
     table = gtk_grid_new();
@@ -566,6 +573,10 @@ static GtkWidget *create_manager_menu (MenuWindow *menuwin,GtkWidget *stack)
     gtk_widget_set_tooltip_text (search_button,_("Search for applications in the menu"));
     gtk_button_set_relief (GTK_BUTTON(search_button),GTK_RELIEF_NONE);
     gtk_grid_attach(GTK_GRID(table), search_button, 0, 1, 1, 1);
+    g_signal_connect (search_button,
+                     "clicked",
+                      G_CALLBACK (swicth_stack_to_entry),
+                      menuwin);
 
     /*create more function button*/
     menu_button = create_menu_button (menuwin, "popover", "open-menu-symbolic");
@@ -586,15 +597,6 @@ static GtkWidget *create_manager_menu (MenuWindow *menuwin,GtkWidget *stack)
                      "clicked",
                       G_CALLBACK (max_show_application),
                       menuwin);
-
-    searchbar = create_search_bar (menuwin);
-    gtk_grid_attach(GTK_GRID(table), searchbar, 0, 2, 4, 1);
-
-    g_object_bind_property (search_button,
-                           "active",
-                            searchbar,
-                           "search-mode-enabled",
-                            G_BINDING_BIDIRECTIONAL);
 
     set_system_lockdown (menuwin->priv->builder);
     return table;
@@ -650,13 +652,14 @@ menu_window_fill (MenuWindow *menuwin)
 {
     GtkWidget *frame;
     GtkWidget *hbox;
-    GtkWidget *stack;
+    GtkWidget *stack, *opt_stack;
     GtkWidget *menu_box;
     GtkWidget *search_box;
     GtkWidget *toplevel;
     GdkScreen *screen;
     GdkVisual *visual;
     GtkWidget *table;
+    GtkWidget *searchbar;
 
     set_box_background (GTK_WIDGET (menuwin));
 
@@ -668,6 +671,7 @@ menu_window_fill (MenuWindow *menuwin)
     gtk_container_add (GTK_CONTAINER (frame), hbox);
 
     stack = gtk_stack_new ();
+    menuwin->priv->stack = stack;
     gtk_box_pack_start (GTK_BOX (hbox), stack, FALSE, FALSE, 0);
     gtk_widget_show_all (frame);
 
@@ -678,14 +682,19 @@ menu_window_fill (MenuWindow *menuwin)
 
     menu_box = create_menu_box_page (menuwin);
     gtk_stack_add_named (GTK_STACK (stack),menu_box,"menu-page");
-
     search_box = create_search_box_page (menuwin);
     gtk_stack_add_named (GTK_STACK (stack),search_box,"search-page");
 
-    table = create_manager_menu (menuwin,stack);
-    gtk_box_pack_start(GTK_BOX(hbox),table, TRUE, TRUE,0);
-    menuwin->priv->stack = stack;
-    gtk_widget_show_all (table);
+    opt_stack = gtk_stack_new ();
+    menuwin->priv->opt_stack = opt_stack;
+    gtk_box_pack_start (GTK_BOX (hbox), opt_stack, FALSE, FALSE, 0);
+
+    table = create_manager_menu (menuwin);
+    gtk_stack_add_named (GTK_STACK (opt_stack), table, "manager-page");
+    searchbar = create_search_bar (menuwin);
+    gtk_stack_add_named (GTK_STACK (opt_stack), searchbar, "find-page");
+
+    gtk_widget_show_all (opt_stack);
 }
 
 static GObject *
