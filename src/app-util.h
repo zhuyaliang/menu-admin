@@ -60,4 +60,8 @@ gboolean   menu_desktop_file_copy           (const char   *source_path,
                                              const char   *target_path,
                                              GError      **error);
 
+gboolean   get_desktop_type                 (void);
+
+void       show_message_dialog              (GtkWindow    *window,
+                                             const char   *message);
 #endif

@@ -16,6 +16,7 @@ struct _MenuWindowPrivate
     GtkWidget  *stack;
     GSettings  *settings;
     GtkBuilder *builder;
+    GDBusProxy *proxy;
 };
 
 G_DEFINE_TYPE_WITH_PRIVATE (MenuWindow, menu_window, GTK_TYPE_WINDOW)
@@ -487,12 +488,54 @@ set_visible_child (GtkToggleButton *button, gpointer data)
     }
 }
 
+static void
+show_application_ready_callback (GObject      *source_object,
+                                 GAsyncResult *res,
+                                 gpointer      user_data)
+{
+    GDBusProxy *proxy = G_DBUS_PROXY (user_data);
+    GError     *error = NULL;
+    GVariant   *ret;
+
+    ret = g_dbus_proxy_call_finish (proxy, res, &error);
+    if (ret)
+    {
+        g_variant_unref (ret);
+    }
+
+    if (error)
+    {
+        g_warning ("Could not ask gnome-shell ShowApplications: %s",
+            error->message);
+        g_error_free (error);
+    }
+}
+static void max_show_application (GtkWidget *button, gpointer user_data)
+{
+    MenuWindow *menuwin = MENU_WINDOW (user_data);
+
+    if (get_desktop_type ())
+    {
+        show_message_dialog (GTK_WINDOW(menuwin), _("The current feature only supports GNOME desktop"));
+        return;
+    }
+    g_dbus_proxy_call (menuwin->priv->proxy,
+                      "ShowApplications",
+                       NULL,
+                       G_DBUS_CALL_FLAGS_NONE,
+                       -1,
+                       NULL,
+                       (GAsyncReadyCallback) show_application_ready_callback,
+                       menuwin->priv->proxy);
+
+}
 static GtkWidget *create_manager_menu (MenuWindow *menuwin,GtkWidget *stack)
 {
     GtkWidget *table;
     GtkWidget *search_button;
     GtkWidget *menu_button;
     GtkWidget *user_button;
+    GtkWidget *show_button;
     GtkWidget *searchbar;
     GtkWidget *separator;
 
@@ -502,7 +545,7 @@ static GtkWidget *create_manager_menu (MenuWindow *menuwin,GtkWidget *stack)
     gtk_grid_set_column_spacing(GTK_GRID(table), 10);
 
     separator = gtk_separator_new (GTK_ORIENTATION_HORIZONTAL);
-    gtk_grid_attach(GTK_GRID(table) ,separator, 0, 0, 3, 1);
+    gtk_grid_attach(GTK_GRID(table) ,separator, 0, 0, 4, 1);
 
     /*create search button*/
     search_button = set_button_style ("edit-find-symbolic");
@@ -520,8 +563,18 @@ static GtkWidget *create_manager_menu (MenuWindow *menuwin,GtkWidget *stack)
     gtk_widget_set_tooltip_text (user_button,_("Managing computer systems and sessions"));
     gtk_grid_attach(GTK_GRID(table), user_button, 2, 1, 1, 1);
 
+    show_button = set_button_style ("view-fullscreen-symbolic");
+    gtk_widget_set_tooltip_text (show_button,_("Maximize  show all applications"));
+    gtk_button_set_relief (GTK_BUTTON(show_button),GTK_RELIEF_NONE);
+    gtk_grid_attach(GTK_GRID(table), show_button, 3, 1, 1, 1);
+    gtk_widget_set_sensitive (show_button, TRUE);
+    g_signal_connect (show_button,
+                     "clicked",
+                      G_CALLBACK (max_show_application),
+                      menuwin);
+
     searchbar = create_search_bar (menuwin);
-    gtk_grid_attach(GTK_GRID(table), searchbar, 0, 2, 3, 1);
+    gtk_grid_attach(GTK_GRID(table), searchbar, 0, 2, 4, 1);
 
     g_signal_connect (search_button, "toggled", (GCallback) set_visible_child,stack);
     g_object_bind_property (search_button,
@@ -648,6 +701,7 @@ menu_window_dispose (GObject *object)
     if (menuwin->priv->settings)
         g_object_unref (menuwin->priv->settings);
     menuwin->priv->settings = NULL;
+    g_object_unref (menuwin->priv->proxy);
     G_OBJECT_CLASS (menu_window_parent_class)->dispose (object);
 }
 
@@ -668,7 +722,14 @@ menu_window_init (MenuWindow *menuwin)
     menuwin->priv = menu_window_get_instance_private (menuwin);
     menuwin->priv->settings = g_settings_new (MENU_ADMID_SCHEMA);
     menuwin->priv->builder = gtk_builder_new_from_resource ("/org/admin/menu/menu-admin-function-manager.ui");
-
+    menuwin->priv->proxy = g_dbus_proxy_new_for_bus_sync (
+                    G_BUS_TYPE_SESSION,
+                    G_DBUS_PROXY_FLAGS_NONE,
+                    NULL,
+                    "org.gnome.Shell",
+                    "/org/gnome/Shell",
+                    "org.gnome.Shell",
+                    NULL, NULL);
     window = GTK_WINDOW (menuwin);
     gtk_window_set_type_hint (window, GDK_WINDOW_TYPE_HINT_MENU);
     gtk_window_set_position (window,GTK_WIN_POS_MOUSE);

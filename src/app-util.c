@@ -557,3 +557,31 @@ app_launch_desktop_file (const char  *desktop_file,
     return retval;
 }
 
+gboolean get_desktop_type (void)
+{
+    const char *desktop = g_getenv ("XDG_CURRENT_DESKTOP");
+
+    if (desktop == NULL)
+        return FALSE;
+
+    if (g_strcmp0 (desktop,"MATE") == 0)
+        return TRUE;
+    else
+        return FALSE;
+
+}
+
+void show_message_dialog (GtkWindow *window, const char *message)
+{
+    GtkWidget *dialog;
+
+    dialog = gtk_message_dialog_new (window,
+                                     GTK_DIALOG_MODAL | GTK_DIALOG_DESTROY_WITH_PARENT,
+                                     GTK_MESSAGE_INFO,
+                                     GTK_BUTTONS_OK_CANCEL,
+                                     _("Application menu message prompt dialog:"));
+    gtk_message_dialog_format_secondary_text (GTK_MESSAGE_DIALOG (dialog),
+                                            "%s", message);
+    gtk_dialog_run (GTK_DIALOG (dialog));
+    gtk_widget_destroy (dialog);
+}

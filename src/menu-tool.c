@@ -56,19 +56,6 @@ static dm_type get_dm_type (void)
     else
         return ERROR;
 }
-static gboolean get_desktop_type (void)
-{
-    const char *desktop = g_getenv ("XDG_CURRENT_DESKTOP");
-
-    if (desktop == NULL)
-        return FALSE;
-
-    if (g_strcmp0 (desktop,"MATE") == 0)
-        return TRUE;
-    else
-        return FALSE;
-
-}
 static void users_loaded (ActUserManager  *manager,
                           GParamSpec      *pspec,
                           gpointer         user_data)
